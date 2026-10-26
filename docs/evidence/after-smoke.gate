@@ -1,0 +1,15 @@
+b911d2458567378fe3d50accc3f2f5aaab00fa968a4008952b85f5f673d2b7ca  /home/slayerbrk/.ticketing/core/permissions.py
+39a15846ca88721bfe411bbc31403fe33c774f31a29748b395098062cd6f7de8  /home/slayerbrk/.ticketing/core/services/knowledge_service.py
+9f9b79f922e46ca0c005c0d155e519d70eb7124b8b4941b7a2e38c6f6e5f8a80  /home/slayerbrk/.ticketing/core/api.py
+08ba254f049eeb0091d3612ec3e5c947895b91946a39c9d4bf4724b087772bc6  /home/slayerbrk/.ticketing/core/models/__init__.py
+2f18b2ff9f923a1a41a3811eb156a237eb5b85531b6fa354c6d1f2b4d77ea6c0  /home/slayerbrk/.ticketing/core/services/ticket_service.py
+945a41241b62b84e10bae3f739218efebcd886e1604237038dbbcfaca326c6ee  /home/slayerbrk/.ticketing/core/services/project_service.py
+1ce1b4b341cc6b9815f19509a5c9418312193938078230c228b1f7d867edb081  /home/slayerbrk/.ticketing/core/indexer.py
+COUNTERS_SHA=46b1de0f0a0fa40bb47b18ec781e7c65b2ce06cacfa8b7183c11e9756e6bf0f6
+USERS_SHA=698299532291b59072775a52f2d0cf4a17ea6662561c98fec7ff7c9885568913
+VAULT_COUNT=57
+EVENTS_ACTIVE=149
+EVENTS_SYMLINKS=149
+TOK_COUNT=1
+PORT_8799=1
+VALIDATE=Validation complete: 22 entities, 0 errors, 0 warnings

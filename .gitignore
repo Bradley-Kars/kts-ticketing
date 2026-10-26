@@ -1,0 +1,63 @@
+# Secrets and credentials
+.env*
+*.env
+config/.env
+*.pem
+*.key
+*secret*
+*token*
+*credential*
+
+# Config with token hashes
+config/users.yaml
+
+# Real vault (Knowledge/Tasks/Projects/events) and runtime state
+events/
+Knowledge/
+Tasks/
+Projects/
+Clients/
+indexes/
+id-counters.json
+after/
+
+# Backups and snapshots
+backups/
+kts-backups/
+progress-snapshots/
+
+# AI directory
+ai/
+
+# Build artifacts and caches
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.eggs/
+.node_modules/
+dist/
+target/
+
+# Databases
+*.sqlite
+*.sqlite3
+*.db
+
+# Python
+build/
+.eggs/
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Coverage
+.coverage/
+htmlcov/
+
+# pytest
+.pytest_cache/
