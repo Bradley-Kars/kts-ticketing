@@ -1,0 +1,106 @@
+# KTS Ticketing System — Problem Schema
+# Root cause records (ITIL Problem Management)
+
+problem:
+  description: "Problem record (root cause analysis)"
+  allOf:
+    - $ref: "base.yaml#/base_record"
+  properties:
+    type:
+      const: "problem"
+      enum: ["problem"]
+
+    description:
+      type: "string"
+
+    status:
+      type: "string"
+      enum:
+        - "investigating"
+        - "known_error"
+        - "workaround"
+        - "resolved"
+        - "closed"
+      default: "investigating"
+
+    priority:
+      type: "string"
+      enum:
+        - "critical"
+        - "high"
+        - "medium"
+        - "low"
+      default: "medium"
+
+    impact:
+      type: "string"
+      enum:
+        - "critical"
+        - "high"
+        - "medium"
+        - "low"
+      default: "medium"
+
+    urgency:
+      type: "string"
+      enum:
+        - "critical"
+        - "high"
+        - "medium"
+        - "low"
+      default: "medium"
+
+    root_cause:
+      type: "string"
+      description: "Identified root cause"
+
+    workaround:
+      type: "string"
+      description: "Temporary workaround"
+
+    organization_id:
+      type: "string"
+      pattern: "^ORG-\\d{6,}$"
+
+    affected_assets:
+      type: "array"
+      items:
+        type: "string"
+        pattern: "^AST-\\d{6,}$"
+
+    related_incidents:
+      type: "array"
+      items:
+        type: "string"
+        pattern: "^(TKT-\\d{4}-\\d{3}|TCK-\\d{6,})$"
+
+    known_error_article:
+      type: "string"
+      pattern: "^KB-\\d{6,}$"
+      description: "Link to KB article documenting known error"
+
+    tags:
+      type: "array"
+      items:
+        type: "string"
+
+    resolved_at:
+      type: "string"
+      format: "date-time"
+
+    custom_fields:
+      type: "object"
+      additionalProperties: true
+
+  required:
+    - "id"
+    - "type"
+    - "title"
+    - "status"
+    - "created_at"
+    - "updated_at"
+    - "created_by"
+    - "updated_by"
+    - "tags"
+    - "relationships"
+    - "description"

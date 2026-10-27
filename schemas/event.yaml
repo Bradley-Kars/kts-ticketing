@@ -1,0 +1,133 @@
+# KTS Ticketing System — Event Schema
+# Immutable audit/event log entries
+
+event:
+  description: "Immutable event/audit record"
+  allOf:
+    - $ref: "base.yaml#/base_record"
+  properties:
+    type:
+      const: "event"
+      enum: ["event"]
+
+    event_id:
+      type: "string"
+      pattern: "^EVT-\\d{8,}$"
+      description: "Event identifier (same as id)"
+
+    timestamp:
+      type: "string"
+      format: "date-time"
+      description: "When the event occurred"
+
+    actor:
+      type: "object"
+      required: ["id", "type"]
+      properties:
+        id:
+          type: "string"
+          pattern: "^(USR|AI|SYS|AUT)-\\d{6,}$"
+        type:
+          type: "string"
+          enum:
+            - "human"
+            - "ai"
+            - "system"
+            - "automation"
+        name:
+          type: "string"
+        email:
+          type: "string"
+          format: "email"
+
+    event_type:
+      type: "string"
+      description: "Dot-notation event type"
+      pattern: "^[a-z]+\\.[a-z_]+$"
+      examples:
+        - "ticket.created"
+        - "ticket.status_changed"
+        - "ticket.assigned"
+        - "ticket.worklog_added"
+        - "client.created"
+        - "asset.updated"
+        - "relationship.created"
+        - "ai.suggestion_created"
+        - "ai.suggestion_accepted"
+        - "automation.rule_triggered"
+
+    entity:
+      type: "object"
+      required: ["type", "id"]
+      properties:
+        type:
+          type: "string"
+          enum:
+            - "ticket"
+            - "client"
+            - "contact"
+            - "organization"
+            - "asset"
+            - "user"
+            - "project"
+            - "task"
+            - "knowledge"
+            - "problem"
+            - "change"
+            - "request"
+            - "contract"
+        id:
+          type: "string"
+          pattern: "^(TKT-\\d{4}-\\d{3}|[A-Z]{3,4}-\\d{6,})$"
+
+    changes:
+      type: "object"
+      description: "Field-level changes (old -> new)"
+      additionalProperties:
+        type: "object"
+        properties:
+          old:
+            type: "string"
+          new:
+            type: "string"
+
+    reason:
+      type: "string"
+      description: "Human-readable reason for the change"
+
+    correlation_id:
+      type: "string"
+      pattern: "^COR-\\d{8,}$"
+      description: "Links related events (e.g., suggestion -> acceptance)"
+
+    causation_id:
+      type: "string"
+      pattern: "^EVT-\\d{8,}$"
+      description: "What caused this event (previous event ID)"
+
+    tags:
+      type: "array"
+      items:
+        type: "string"
+
+    metadata:
+      type: "object"
+      additionalProperties: true
+      description: "Additional event context"
+
+  required:
+    - "id"
+    - "type"
+    - "title"
+    - "status"
+    - "created_at"
+    - "updated_at"
+    - "created_by"
+    - "updated_by"
+    - "tags"
+    - "relationships"
+    - "event_id"
+    - "timestamp"
+    - "actor"
+    - "event_type"
+    - "entity"

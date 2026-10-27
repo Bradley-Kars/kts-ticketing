@@ -1,0 +1,240 @@
+# KTS Ticketing System — AI Schemas
+# Observations, Suggestions, Actions
+
+ai_observation:
+  description: "Passive AI observation (no human decision required)"
+  allOf:
+    - $ref: "base.yaml#/base_record"
+  properties:
+    type:
+      const: "ai_observation"
+      enum: ["ai_observation"]
+
+    observation_id:
+      type: "string"
+      pattern: "^AIO-\\d{6,}$"
+
+    observation:
+      type: "object"
+      required: ["kind", "data", "confidence", "generated_at", "model"]
+      properties:
+        kind:
+          type: "string"
+          enum:
+            - "similar_tickets_found"
+            - "classification_made"
+            - "anomaly_detected"
+            - "pattern_recognized"
+            - "sla_risk_identified"
+            - "knowledge_match"
+            - "asset_relationship_found"
+        data:
+          type: "object"
+          additionalProperties: true
+        confidence:
+          type: "number"
+          minimum: 0
+          maximum: 1
+        generated_at:
+          type: "string"
+          format: "date-time"
+        model:
+          type: "string"
+
+    target_entity:
+      type: "object"
+      required: ["type", "id"]
+      properties:
+        type:
+          type: "string"
+        id:
+          type: "string"
+          pattern: "^(TKT-\\d{4}-\\d{3}|[A-Z]{3,4}-\\d{6,})$"
+
+    status:
+      type: "string"
+      enum:
+        - "active"
+        - "acknowledged"
+        - "dismissed"
+      default: "active"
+
+  required:
+    - "id"
+    - "type"
+    - "title"
+    - "status"
+    - "created_at"
+    - "updated_at"
+    - "created_by"
+    - "updated_by"
+    - "tags"
+    - "relationships"
+    - "observation_id"
+    - "observation"
+    - "target_entity"
+
+---
+
+ai_suggestion:
+  description: "AI suggestion requiring human decision"
+  allOf:
+    - $ref: "base.yaml#/base_record"
+  properties:
+    type:
+      const: "ai_suggestion"
+      enum: ["ai_suggestion"]
+
+    suggestion_id:
+      type: "string"
+      pattern: "^AIS-\\d{6,}$"
+
+    suggestion:
+      type: "object"
+      required: ["action", "target", "proposed_value", "confidence", "reasoning"]
+      properties:
+        action:
+          type: "string"
+          enum:
+            - "change_status"
+            - "change_priority"
+            - "assign_user"
+            - "assign_team"
+            - "add_tag"
+            - "create_task"
+            - "create_knowledge"
+            - "link_entity"
+            - "send_notification"
+            - "escalate"
+            - "run_automation"
+        target:
+          type: "object"
+          required: ["type", "id"]
+          properties:
+            type:
+              type: "string"
+            id:
+              type: "string"
+              pattern: "^(TKT-\\d{4}-\\d{3}|[A-Z]{3,4}-\\d{6,})$"
+        proposed_value:
+          type: "string"
+        current_value:
+          type: "string"
+        confidence:
+          type: "number"
+          minimum: 0
+          maximum: 1
+        reasoning:
+          type: "string"
+        supporting_evidence:
+          type: "array"
+          items:
+            type: "string"
+        requires_approval:
+          type: "boolean"
+          default: true
+
+    status:
+      type: "string"
+      enum:
+        - "pending"
+        - "accepted"
+        - "rejected"
+        - "edited"
+        - "expired"
+      default: "pending"
+
+    created_at:
+      type: "string"
+      format: "date-time"
+
+    expires_at:
+      type: "string"
+      format: "date-time"
+
+    model:
+      type: "string"
+
+    resolved_at:
+      type: "string"
+      format: "date-time"
+
+    resolved_by:
+      type: "string"
+      pattern: "^(USR|AI|SYS|AUT)-\\d{6,}$"
+
+    resolution_action:
+      type: "string"
+
+  required:
+    - "id"
+    - "type"
+    - "title"
+    - "status"
+    - "created_at"
+    - "updated_at"
+    - "created_by"
+    - "updated_by"
+    - "tags"
+    - "relationships"
+    - "suggestion_id"
+    - "suggestion"
+
+---
+
+ai_action:
+  description: "Executed AI action (after suggestion acceptance)"
+  allOf:
+    - $ref: "base.yaml#/base_record"
+  properties:
+    type:
+      const: "ai_action"
+      enum: ["ai_action"]
+
+    action_id:
+      type: "string"
+      pattern: "^AIA-\\d{6,}$"
+
+    source_suggestion:
+      type: "string"
+      pattern: "^AIS-\\d{6,}$"
+
+    executed_by:
+      type: "string"
+      pattern: "^(USR|AI|SYS|AUT)-\\d{6,}$"
+
+    executed_at:
+      type: "string"
+      format: "date-time"
+
+    result_event:
+      type: "string"
+      pattern: "^EVT-\\d{8,}$"
+
+    status:
+      type: "string"
+      enum:
+        - "completed"
+        - "failed"
+        - "rolled_back"
+      default: "completed"
+
+    error_message:
+      type: "string"
+
+  required:
+    - "id"
+    - "type"
+    - "title"
+    - "status"
+    - "created_at"
+    - "updated_at"
+    - "created_by"
+    - "updated_by"
+    - "tags"
+    - "relationships"
+    - "action_id"
+    - "source_suggestion"
+    - "executed_by"
+    - "executed_at"
+    - "result_event"

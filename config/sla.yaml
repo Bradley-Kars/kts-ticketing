@@ -1,0 +1,238 @@
+# KTS Ticketing System — SLA Policies
+
+sla_policies:
+  standard:
+    name: "Standard Support"
+    description: "Default SLA for most tickets"
+    business_hours:
+      enabled: true
+      timezone: "America/Chicago"
+      monday:
+        - start: "08:30"
+          end: "15:30"
+      tuesday:
+        - start: "08:30"
+          end: "15:30"
+      wednesday:
+        - start: "08:30"
+          end: "15:30"
+      thursday:
+        - start: "08:30"
+          end: "15:30"
+      friday:
+        - start: "08:30"
+          end: "15:30"
+      saturday: []
+      sunday: []
+    holidays:
+      - "2026-01-01"
+      - "2026-05-25"
+      - "2026-07-04"
+      - "2026-09-07"
+      - "2026-11-26"
+      - "2026-12-25"
+    targets:
+      critical:
+        response_minutes: 15
+        resolution_hours: 4
+      high:
+        response_minutes: 60
+        resolution_hours: 8
+      medium:
+        response_minutes: 240
+        resolution_hours: 48
+      low:
+        response_minutes: 1440
+        resolution_hours: 120
+    escalation:
+      enabled: true
+      levels:
+        - after_minutes: 30
+          notify: ["assignee", "dispatcher"]
+        - after_minutes: 120
+          notify: ["assignee", "dispatcher", "manager"]
+        - after_minutes: 480
+          notify: ["assignee", "dispatcher", "manager", "admin"]
+    breach_action: "flag_sla_at_risk"
+    pause_on_waiting: true
+    pause_on_customer: true
+
+  problem:
+    name: "Problem Management"
+    description: "Longer timelines for root cause analysis"
+    business_hours:
+      enabled: true
+      timezone: "America/Chicago"
+      monday:
+        - start: "08:30"
+          end: "15:30"
+      tuesday:
+        - start: "08:30"
+          end: "15:30"
+      wednesday:
+        - start: "08:30"
+          end: "15:30"
+      thursday:
+        - start: "08:30"
+          end: "15:30"
+      friday:
+        - start: "08:30"
+          end: "15:30"
+      saturday: []
+      sunday: []
+    targets:
+      critical:
+        response_minutes: 60
+        resolution_hours: 72
+      high:
+        response_minutes: 240
+        resolution_hours: 168
+      medium:
+        response_minutes: 1440
+        resolution_hours: 336
+      low:
+        response_minutes: 2880
+        resolution_hours: 672
+    escalation:
+      enabled: true
+      levels:
+        - after_minutes: 1440
+          notify: ["assignee", "manager"]
+        - after_minutes: 10080
+          notify: ["assignee", "manager", "admin"]
+    pause_on_waiting: true
+
+  change:
+    name: "Change Management"
+    description: "Scheduled changes with planned windows"
+    business_hours:
+      enabled: true
+      timezone: "America/Chicago"
+      monday:
+        - start: "08:30"
+          end: "15:30"
+      tuesday:
+        - start: "08:30"
+          end: "15:30"
+      wednesday:
+        - start: "08:30"
+          end: "15:30"
+      thursday:
+        - start: "08:30"
+          end: "15:30"
+      friday:
+        - start: "08:30"
+          end: "15:30"
+      saturday:
+        - start: "12:00"
+          end: "22:00"
+      sunday:
+        - start: "12:00"
+          end: "18:00"
+    targets:
+      critical:
+        response_minutes: 15
+        resolution_hours: 2
+      high:
+        response_minutes: 30
+        resolution_hours: 4
+      medium:
+        response_minutes: 60
+        resolution_hours: 8
+      low:
+        response_minutes: 120
+        resolution_hours: 24
+    pause_on_waiting: false
+
+  maintenance:
+    name: "Maintenance Window"
+    description: "Scheduled maintenance with defined windows"
+    business_hours:
+      enabled: false
+    targets:
+      critical:
+        response_minutes: 0
+        resolution_hours: 0
+      high:
+        response_minutes: 0
+        resolution_hours: 0
+      medium:
+        response_minutes: 0
+        resolution_hours: 0
+      low:
+        response_minutes: 0
+        resolution_hours: 0
+    pause_on_waiting: false
+
+  project:
+    name: "Project Work"
+    description: "Project tasks follow project timeline, not SLA"
+    business_hours:
+      enabled: true
+      timezone: "America/Chicago"
+      monday:
+        - start: "08:30"
+          end: "15:30"
+      tuesday:
+        - start: "08:30"
+          end: "15:30"
+      wednesday:
+        - start: "08:30"
+          end: "15:30"
+      thursday:
+        - start: "08:30"
+          end: "15:30"
+      friday:
+        - start: "08:30"
+          end: "15:30"
+      saturday: []
+      sunday: []
+    targets:
+      critical:
+        response_minutes: 240
+        resolution_hours: 168
+      high:
+        response_minutes: 480
+        resolution_hours: 336
+      medium:
+        response_minutes: 1440
+        resolution_hours: 672
+      low:
+        response_minutes: 2880
+        resolution_hours: 1344
+    escalation:
+      enabled: false
+    pause_on_waiting: true
+
+  internal:
+    name: "Internal IT"
+    description: "No SLA for internal work"
+    business_hours:
+      enabled: false
+    targets:
+      critical:
+        response_minutes: 0
+        resolution_hours: 0
+      high:
+        response_minutes: 0
+        resolution_hours: 0
+      medium:
+        response_minutes: 0
+        resolution_hours: 0
+      low:
+        response_minutes: 0
+        resolution_hours: 0
+    escalation:
+      enabled: false
+    pause_on_waiting: false
+
+# Default policy per ticket type
+defaults:
+  incident: standard
+  service_request: standard
+  problem: problem
+  change: change
+  maintenance: maintenance
+  project: project
+  internal: internal
+  question: standard

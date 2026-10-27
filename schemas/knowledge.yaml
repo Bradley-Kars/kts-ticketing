@@ -1,0 +1,129 @@
+# KTS Ticketing System — Knowledge Article Schema
+
+knowledge:
+  description: "Knowledge base article"
+  allOf:
+    - $ref: "base.yaml#/base_record"
+  properties:
+    type:
+      const: "knowledge"
+      enum: ["knowledge"]
+
+    status:
+      type: "string"
+      enum:
+        - "draft"
+        - "review"
+        - "published"
+        - "archived"
+      default: "draft"
+
+    category:
+      type: "string"
+      enum:
+        - "networking"
+        - "security"
+        - "hardware"
+        - "software"
+        - "email"
+        - "backup"
+        - "procedures"
+        - "troubleshooting"
+        - "onboarding"
+        - "compliance"
+        - "general"
+
+    subcategory:
+      type: "string"
+
+    author:
+      type: "string"
+      pattern: "^USR-\\d{6,}$"
+
+    reviewer:
+      type: "string"
+      pattern: "^USR-\\d{6,}$"
+
+    review_date:
+      type: "string"
+      format: "date"
+
+    version:
+      type: "integer"
+      minimum: 1
+      default: 1
+
+    visibility:
+      type: "string"
+      enum:
+        - "internal"
+        - "customer"
+        - "public"
+      default: "internal"
+
+    content:
+      type: "string"
+      description: "Markdown content"
+
+    related_tickets:
+      type: "array"
+      items:
+        type: "string"
+        pattern: "^(TKT-\\d{4}-\\d{3}|TCK-\\d{6,})$"
+
+    related_assets:
+      type: "array"
+      items:
+        type: "string"
+        pattern: "^AST-\\d{6,}$"
+
+    related_problems:
+      type: "array"
+      items:
+        type: "string"
+        pattern: "^PRB-\\d{6,}$"
+
+    related_changes:
+      type: "array"
+      items:
+        type: "string"
+        pattern: "^CHG-\\d{6,}$"
+
+    tags:
+      type: "array"
+      items:
+        type: "string"
+
+    published_at:
+      type: "string"
+      format: "date-time"
+
+    ai:
+      type: "object"
+      properties:
+        summary_generated:
+          type: "boolean"
+        embedding_model:
+          type: "string"
+        embedding_updated:
+          type: "string"
+          format: "date-time"
+        classification_model:
+          type: "string"
+        search_vector_id:
+          type: "string"
+
+  required:
+    - "id"
+    - "type"
+    - "title"
+    - "status"
+    - "created_at"
+    - "updated_at"
+    - "created_by"
+    - "updated_by"
+    - "tags"
+    - "relationships"
+    - "category"
+    - "author"
+    - "content"

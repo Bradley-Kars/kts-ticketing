@@ -1,0 +1,304 @@
+# KTS Ticketing System — Ticket Schema
+# Extends base_record with ticket-specific fields
+
+ticket:
+  description: "Ticket/incident/service request record"
+  allOf:
+    - $ref: "base.yaml#/base_record"
+  properties:
+    type:
+      const: "ticket"
+      enum: ["ticket"]
+
+    # Ticket classification
+    ticket_type:
+      type: "string"
+      description: "ITIL ticket type"
+      enum:
+        - "incident"
+        - "service_request"
+        - "problem"
+        - "change"
+        - "task"
+        - "maintenance"
+        - "project"
+        - "internal"
+        - "question"
+      default: "incident"
+
+    # Status & Priority (validated against config)
+    status:
+      type: "string"
+      description: "Current status"
+      enum:
+        - "new"
+        - "triaged"
+        - "in-progress"
+        - "waiting"
+        - "resolved"
+        - "closed"
+        - "cancelled"
+      default: "new"
+
+    priority:
+      type: "string"
+      enum:
+        - "critical"
+        - "high"
+        - "medium"
+        - "low"
+        - "informational"
+      default: "medium"
+
+    impact:
+      type: "string"
+      enum:
+        - "critical"
+        - "high"
+        - "medium"
+        - "low"
+      default: "medium"
+
+    urgency:
+      type: "string"
+      enum:
+        - "critical"
+        - "high"
+        - "medium"
+        - "low"
+      default: "medium"
+
+    priority_override:
+      type: "boolean"
+      default: false
+      description: "Whether priority was manually overridden"
+
+    override_reason:
+      type: "string"
+      description: "Reason for priority override"
+
+    # Classification
+    category:
+      type: "string"
+      enum:
+        - "support"
+        - "setup"
+        - "maintenance"
+        - "project"
+        - "billing"
+        - "follow-up"
+        - "security"
+        - "backup"
+      default: "support"
+
+    subcategory:
+      type: "string"
+      description: "Subcategory within category"
+
+    work_type:
+      type: "string"
+      enum:
+        - "virus"
+        - "network"
+        - "email"
+        - "hardware"
+        - "software"
+        - "audio"
+        - "security"
+        - "backup"
+        - "consult"
+        - "other"
+      default: "other"
+
+    # Core relationships
+    organization_id:
+      type: "string"
+      pattern: "^ORG-\\d{6,}$"
+      description: "Customer organization"
+
+    contact_id:
+      type: "string"
+      pattern: "^CON-\\d{6,}$"
+      description: "Primary contact"
+
+    asset_id:
+      type: "string"
+      pattern: "^AST-\\d{6,}$"
+      description: "Primary affected asset"
+
+    parent_ticket_id:
+      type: "string"
+      pattern: "^(TKT-\\d{4}-\\d{3}|TCK-\\d{6,})$"
+      description: "Parent ticket (for subtasks)"
+
+    root_cause_id:
+      type: "string"
+      pattern: "^PRB-\\d{6,}$"
+      description: "Root cause problem record"
+
+    # Assignment
+    assigned_to:
+      type: "string"
+      pattern: "^USR-\\d{6,}$"
+      description: "Assigned technician"
+
+    assigned_team:
+      type: "string"
+      description: "Assigned team name"
+
+    created_by:
+      type: "string"
+      pattern: "^(USR|AI|SYS|AUT)-\\d{6,}$"
+
+    # SLA
+    sla_policy:
+      type: "string"
+      default: "standard"
+
+    sla_response_due:
+      type: "string"
+      format: "date-time"
+
+    sla_resolution_due:
+      type: "string"
+      format: "date-time"
+
+    sla_paused:
+      type: "boolean"
+      default: false
+
+    sla_pause_reason:
+      type: "string"
+
+    # Source
+    source:
+      type: "string"
+      enum:
+        - "phone"
+        - "email"
+        - "web"
+        - "walk-in"
+        - "monitoring"
+        - "chat"
+        - "referral"
+      default: "phone"
+
+    channel:
+      type: "string"
+      enum:
+        - "phone"
+        - "email"
+        - "onsite"
+        - "remote"
+        - "web"
+        - "chat"
+
+    # Workflow
+    next_action:
+      type: "string"
+      maxLength: 200
+      description: "Single concrete next step (<12 words)"
+
+    due:
+      type: "string"
+      format: "date"
+
+    follow_up:
+      type: "string"
+      format: "date"
+      description: "Required when status = waiting"
+
+    # Worklog (billing source of truth)
+    worklog:
+      type: "array"
+      items:
+        type: "object"
+        required: ["date", "mode", "hours", "amount", "payment"]
+        properties:
+          date:
+            type: "string"
+            format: "date"
+          mode:
+            type: "string"
+            enum:
+              - "onsite"
+              - "remote"
+              - "email"
+              - "phone"
+              - "web"
+          hours:
+            type: "number"
+            minimum: 0
+          amount:
+            type: "number"
+            minimum: 0
+          payment:
+            type: "string"
+            enum:
+              - "paid-cash"
+              - "paid-card"
+              - "paid-check"
+              - "invoiced"
+              - "uninvoiced"
+              - "no-charge"
+          description:
+            type: "string"
+
+    # Resolution
+    resolution:
+      type: "string"
+      description: "What fixed it, what customer confirmed"
+
+    resolution_category:
+      type: "string"
+      enum:
+        - "fixed"
+        - "workaround"
+        - "no_issue_found"
+        - "customer_cancelled"
+        - "out_of_scope"
+        - "duplicate"
+
+    # AI fields
+    ai:
+      type: "object"
+      properties:
+        classification_confidence:
+          type: "number"
+          minimum: 0
+          maximum: 1
+        classification_model:
+          type: "string"
+        classification_categories:
+          type: "array"
+          items:
+            type: "string"
+        summary_generated:
+          type: "boolean"
+        summary_model:
+          type: "string"
+        troubleshooting_suggested:
+          type: "boolean"
+        troubleshooting_model:
+          type: "string"
+        similar_tickets:
+          type: "array"
+          items:
+            type: "string"
+            pattern: "^(TKT-\\d{4}-\\d{3}|TCK-\\d{6,})$"
+
+  required:
+    - "id"
+    - "type"
+    - "title"
+    - "status"
+    - "created_at"
+    - "updated_at"
+    - "created_by"
+    - "updated_by"
+    - "tags"
+    - "relationships"
+    - "ticket_type"
+    - "category"
+    - "work_type"
+    - "worklog"

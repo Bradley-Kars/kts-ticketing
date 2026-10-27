@@ -1,0 +1,103 @@
+# KTS Ticketing System — Service Request Schema
+# Formal service requests (distinct from incidents)
+
+request:
+  description: "Service request record"
+  allOf:
+    - $ref: "base.yaml#/base_record"
+  properties:
+    type:
+      const: "request"
+      enum: ["request"]
+
+    request_type:
+      type: "string"
+      enum:
+        - "access"
+        - "hardware"
+        - "software"
+        - "account"
+        - "permission"
+        - "information"
+        - "onboarding"
+        - "offboarding"
+        - "relocation"
+        - "other"
+      default: "other"
+
+    description:
+      type: "string"
+
+    status:
+      type: "string"
+      enum:
+        - "submitted"
+        - "approved"
+        - "fulfilled"
+        - "rejected"
+        - "cancelled"
+      default: "submitted"
+
+    priority:
+      type: "string"
+      enum:
+        - "critical"
+        - "high"
+        - "medium"
+        - "low"
+      default: "medium"
+
+    requester:
+      type: "string"
+      pattern: "^CON-\\d{6,}$"
+
+    organization_id:
+      type: "string"
+      pattern: "^ORG-\\d{6,}$"
+
+    approver:
+      type: "string"
+      pattern: "^USR-\\d{6,}$"
+
+    fulfiller:
+      type: "string"
+      pattern: "^USR-\\d{6,}$"
+
+    approval_date:
+      type: "string"
+      format: "date-time"
+
+    fulfillment_date:
+      type: "string"
+      format: "date-time"
+
+    cost:
+      type: "number"
+      minimum: 0
+
+    recurring_cost:
+      type: "number"
+      minimum: 0
+
+    tags:
+      type: "array"
+      items:
+        type: "string"
+
+    custom_fields:
+      type: "object"
+      additionalProperties: true
+
+  required:
+    - "id"
+    - "type"
+    - "title"
+    - "status"
+    - "created_at"
+    - "updated_at"
+    - "created_by"
+    - "updated_by"
+    - "tags"
+    - "relationships"
+    - "request_type"
+    - "requester"

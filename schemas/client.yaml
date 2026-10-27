@@ -1,0 +1,164 @@
+# KTS Ticketing System — Client Schema
+# Extends base_record
+
+client:
+  description: "Customer/client record (business or residential)"
+  allOf:
+    - $ref: "base.yaml#/base_record"
+  properties:
+    type:
+      const: "client"
+      enum: ["client"]
+
+    class:
+      type: "string"
+      enum:
+        - "business"
+        - "residential"
+      default: "residential"
+
+    client_id:
+      type: "string"
+      pattern: "^CUS-\\d{6,}$"
+      description: "Client identifier (same as id)"
+
+    # Person/Company name
+    first_name:
+      type: "string"
+      description: "First name (residential) or contact first name (business)"
+    last_name:
+      type: "string"
+      description: "Last name (residential) or contact last name (business)"
+    company_name:
+      type: "string"
+      description: "Company name (business clients only)"
+
+    # Display name (computed)
+    display_name:
+      type: "string"
+      description: "Formatted display name"
+
+    # Organization link (for business clients)
+    organization_id:
+      type: "string"
+      pattern: "^ORG-\\d{6,}$"
+
+    # Primary contact info
+    email:
+      type: "array"
+      items:
+        type: "string"
+        format: "email"
+      uniqueItems: true
+
+    phone:
+      type: "array"
+      items:
+        type: "string"
+      uniqueItems: true
+
+    preferred_contact_method:
+      type: "string"
+      enum:
+        - "email"
+        - "phone"
+        - "sms"
+        - "mail"
+      default: "email"
+
+    # Address
+    address:
+      type: "object"
+      properties:
+        street:
+          type: "string"
+        city:
+          type: "string"
+        state:
+          type: "string"
+        postal_code:
+          type: "string"
+        country:
+          type: "string"
+          default: "US"
+
+    # Billing
+    billing:
+      type: "object"
+      properties:
+        rate:
+          type: "number"
+          minimum: 0
+          description: "Hourly rate (0 = use default)"
+        terms:
+          type: "string"
+          enum:
+            - "due-upon-receipt"
+            - "net15"
+            - "net30"
+            - "net60"
+            - "custom"
+          default: "due-upon-receipt"
+        currency:
+          type: "string"
+          default: "USD"
+        tax_exempt:
+          type: "boolean"
+          default: false
+        tax_id:
+          type: "string"
+        po_required:
+          type: "boolean"
+          default: false
+        billing_contact_id:
+          type: "string"
+          pattern: "^CON-\\d{6,}$"
+        paypal:
+          type: "string"
+        notes:
+          type: "string"
+
+    # SLA
+    sla_policy:
+      type: "string"
+      default: "standard"
+
+    contract_id:
+      type: "string"
+      pattern: "^CRT-\\d{6,}$"
+
+    # Status
+    status:
+      type: "string"
+      enum:
+        - "active"
+        - "prospect"
+        - "inactive"
+        - "former"
+      default: "active"
+
+    # Equipment tags
+    equipment:
+      type: "array"
+      items:
+        type: "string"
+      description: "Tags: router, firewall, pos, nas, server, laptop, etc."
+
+    # Custom fields
+    custom_fields:
+      type: "object"
+      additionalProperties: true
+
+  required:
+    - "id"
+    - "type"
+    - "title"
+    - "status"
+    - "created_at"
+    - "updated_at"
+    - "created_by"
+    - "updated_by"
+    - "tags"
+    - "relationships"
+    - "class"
+    - "client_id"

@@ -1,0 +1,105 @@
+# KTS Ticketing System — Project Schema
+# Multi-ticket initiatives
+
+project:
+  description: "Project record"
+  allOf:
+    - $ref: "base.yaml#/base_record"
+  properties:
+    type:
+      const: "project"
+      enum: ["project"]
+
+    description:
+      type: "string"
+
+    organization_id:
+      type: "string"
+      pattern: "^ORG-\\d{6,}$"
+
+    project_manager:
+      type: "string"
+      pattern: "^USR-\\d{6,}$"
+
+    sponsor:
+      type: "string"
+      pattern: "^CON-\\d{6,}$"
+
+    status:
+      type: "string"
+      enum:
+        - "planning"
+        - "active"
+        - "on-hold"
+        - "completed"
+        - "cancelled"
+      default: "planning"
+
+    priority:
+      type: "string"
+      enum:
+        - "critical"
+        - "high"
+        - "medium"
+        - "low"
+      default: "medium"
+
+    methodology:
+      type: "string"
+      enum:
+        - "agile"
+        - "waterfall"
+        - "hybrid"
+      default: "waterfall"
+
+    start_date:
+      type: "string"
+      format: "date"
+
+    target_date:
+      type: "string"
+      format: "date"
+
+    actual_end_date:
+      type: "string"
+      format: "date"
+
+    budget_hours:
+      type: "number"
+      minimum: 0
+
+    budget_amount:
+      type: "number"
+      minimum: 0
+
+    actual_hours:
+      type: "number"
+      minimum: 0
+      default: 0
+
+    actual_amount:
+      type: "number"
+      minimum: 0
+      default: 0
+
+    tags:
+      type: "array"
+      items:
+        type: "string"
+
+    custom_fields:
+      type: "object"
+      additionalProperties: true
+
+  required:
+    - "id"
+    - "type"
+    - "title"
+    - "status"
+    - "created_at"
+    - "updated_at"
+    - "created_by"
+    - "updated_by"
+    - "tags"
+    - "relationships"
+    - "organization_id"

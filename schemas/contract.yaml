@@ -1,0 +1,131 @@
+# KTS Ticketing System — Contract Schema
+# Service contracts, SLAs, agreements
+
+contract:
+  description: "Service contract/SLA agreement"
+  allOf:
+    - $ref: "base.yaml#/base_record"
+  properties:
+    type:
+      const: "contract"
+      enum: ["contract"]
+
+    contract_type:
+      type: "string"
+      enum:
+        - "managed_services"
+        - "project"
+        - "break-fix"
+        - "retainer"
+        - "sla"
+        - "nda"
+        - "msp"
+      default: "managed_services"
+
+    organization_id:
+      type: "string"
+      pattern: "^ORG-\\d{6,}$"
+
+    status:
+      type: "string"
+      enum:
+        - "draft"
+        - "active"
+        - "renewal_pending"
+        - "expired"
+        - "terminated"
+      default: "draft"
+
+    start_date:
+      type: "string"
+      format: "date"
+
+    end_date:
+      type: "string"
+      format: "date"
+
+    auto_renew:
+      type: "boolean"
+      default: true
+
+    renewal_notice_days:
+      type: "integer"
+      default: 30
+
+    billing:
+      type: "object"
+      properties:
+        amount:
+          type: "number"
+          minimum: 0
+        frequency:
+          type: "string"
+          enum:
+            - "monthly"
+            - "quarterly"
+            - "annually"
+          default: "monthly"
+        currency:
+          type: "string"
+          default: "USD"
+        payment_terms:
+          type: "string"
+          enum:
+            - "due-upon-receipt"
+            - "net15"
+            - "net30"
+            - "net60"
+          default: "net30"
+        included_hours:
+          type: "number"
+          minimum: 0
+        overage_rate:
+          type: "number"
+          minimum: 0
+
+    sla_policy:
+      type: "string"
+      default: "standard"
+
+    covered_assets:
+      type: "array"
+      items:
+        type: "string"
+        pattern: "^AST-\\d{6,}$"
+
+    covered_services:
+      type: "array"
+      items:
+        type: "string"
+
+    exclusions:
+      type: "array"
+      items:
+        type: "string"
+
+    document_path:
+      type: "string"
+      description: "Path to signed contract PDF"
+
+    tags:
+      type: "array"
+      items:
+        type: "string"
+
+    custom_fields:
+      type: "object"
+      additionalProperties: true
+
+  required:
+    - "id"
+    - "type"
+    - "title"
+    - "status"
+    - "created_at"
+    - "updated_at"
+    - "created_by"
+    - "updated_by"
+    - "tags"
+    - "relationships"
+    - "contract_type"
+    - "organization_id"

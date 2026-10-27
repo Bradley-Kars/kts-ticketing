@@ -1,0 +1,318 @@
+# KTS Ticketing System — UI Configuration
+
+ui:
+  theme:
+    default: "dark"
+    options: ["dark", "light", "system"]
+    brand_colors:
+      ink: "#0A1628"
+      panel: "#101E33"
+      panel_2: "#152A47"
+      line: "rgba(139, 157, 179, 0.16)"
+      muted: "#8B9DB3"
+      off: "#EDF2F7"
+      teal: "#2DD4BF"
+      teal_dim: "#1B8F82"
+      amber: "#F5A623"
+      amber_dim: "#C9860F"
+      white: "#FFFFFF"
+      gray_50: "#F8FAFC"
+      gray_100: "#F1F5F9"
+      gray_200: "#E2E8F0"
+      gray_300: "#CBD5E1"
+      red: "#E5484D"
+      green: "#46A758"
+    fonts:
+      display: "Space Grotesk"
+      body: "Inter"
+      mono: "JetBrains Mono"
+
+  # Navigation
+  navigation:
+    primary:
+      - id: "dashboard"
+        label: "Dashboard"
+        icon: "layout-dashboard"
+        route: "/dashboard"
+        roles: ["*"]
+      - id: "tickets"
+        label: "Tickets"
+        icon: "ticket"
+        route: "/tickets"
+        roles: ["*"]
+        children:
+          - id: "tickets-board"
+            label: "Board"
+            route: "/tickets/board"
+          - id: "tickets-table"
+            label: "Table"
+            route: "/tickets/table"
+          - id: "tickets-kanban"
+            label: "Kanban"
+            route: "/tickets/kanban"
+          - id: "tickets-calendar"
+            label: "Calendar"
+            route: "/tickets/calendar"
+      - id: "customers"
+        label: "Customers"
+        icon: "users"
+        route: "/customers"
+        roles: ["*"]
+        children:
+          - id: "customers-list"
+            label: "All Customers"
+            route: "/customers"
+          - id: "customers-organizations"
+            label: "Organizations"
+            route: "/organizations"
+          - id: "customers-contacts"
+            label: "Contacts"
+            route: "/contacts"
+      - id: "assets"
+        label: "Assets"
+        icon: "monitor"
+        route: "/assets"
+        roles: ["*"]
+      - id: "projects"
+        label: "Projects"
+        icon: "folder-git"
+        route: "/projects"
+        roles: ["admin", "technician", "manager"]
+      - id: "knowledge"
+        label: "Knowledge"
+        icon: "book-open"
+        route: "/knowledge"
+        roles: ["*"]
+      - id: "reports"
+        label: "Reports"
+        icon: "bar-chart-2"
+        route: "/reports"
+        roles: ["admin", "manager"]
+      - id: "automation"
+        label: "Automation"
+        icon: "zap"
+        route: "/automation"
+        roles: ["admin", "manager"]
+      - id: "settings"
+        label: "Settings"
+        icon: "settings"
+        route: "/settings"
+        roles: ["admin"]
+
+  # Dashboard layout
+  dashboard:
+    hero:
+      enabled: true
+      title: "Kars Tech Solutions"
+      tagline: "Local IT Support — Brainerd Lakes Area"
+      show_logo: true
+      logo_size: 140
+      show_contact: true
+      contact_phone: "(218) 656-0574"
+      contact_email: "Bradley.Kars@KarsTechSolutions.com"
+      contact_web: "karstechsolutions.com"
+    cards:
+      - id: "open-tickets"
+        type: "metric"
+        title: "Open Tickets"
+        query: "tickets.open.count"
+        icon: "ticket"
+        color: "teal"
+        link: "/tickets?status=open"
+      - id: "critical-tickets"
+        type: "metric"
+        title: "Critical"
+        query: "tickets.priority.critical.count"
+        icon: "alert-triangle"
+        color: "red"
+        link: "/tickets?priority=critical"
+      - id: "high-tickets"
+        type: "metric"
+        title: "High Priority"
+        query: "tickets.priority.high.count"
+        icon: "alert-circle"
+        color: "amber"
+        link: "/tickets?priority=high"
+      - id: "sla-at-risk"
+        type: "metric"
+        title: "SLA At Risk"
+        query: "tickets.tags.sla-at-risk.count"
+        icon: "clock"
+        color: "red"
+        link: "/tickets?tag=sla-at-risk"
+      - id: "my-workload"
+        type: "workload"
+        title: "My Workload"
+        query: "tickets.assignee.current_user"
+        link: "/tickets?assignee=me"
+    panels:
+      - id: "recent-tickets"
+        type: "table"
+        title: "Recent Tickets"
+        query: "tickets.recent"
+        limit: 10
+        columns: ["id", "title", "client", "priority", "status", "assignee", "updated_at"]
+        link: "/tickets"
+      - id: "my-tickets"
+        type: "table"
+        title: "My Tickets"
+        query: "tickets.assignee.current_user.open"
+        limit: 10
+        columns: ["id", "title", "client", "priority", "status", "sla_remaining"]
+        link: "/tickets?assignee=me"
+      - id: "sla-at-risk-panel"
+        type: "list"
+        title: "SLA At Risk"
+        query: "tickets.tags.sla-at-risk"
+        limit: 10
+        fields: ["id", "title", "sla_remaining", "assignee"]
+        link: "/tickets?tag=sla-at-risk"
+      - id: "ai-recommendations"
+        type: "ai-recommendations"
+        title: "AI Recommendations"
+        limit: 5
+      - id: "upcoming-tasks"
+        type: "table"
+        title: "Upcoming Tasks"
+        query: "tasks.upcoming"
+        limit: 10
+        columns: ["id", "title", "project", "assignee", "due_date"]
+        link: "/tasks"
+      - id: "recent-activity"
+        type: "activity"
+        title: "Recent Activity"
+        query: "events.recent"
+        limit: 10
+
+  # Ticket views
+  tickets:
+    table:
+      default_columns: ["id", "title", "client", "priority", "status", "assignee", "category", "created_at", "updated_at", "sla_remaining"]
+      sortable: true
+      filterable: true
+      page_size: 25
+      page_size_options: [10, 25, 50, 100]
+    kanban:
+      columns:
+        - status: "new"
+          label: "New"
+          color: "kt-new"
+        - status: "triaged"
+          label: "Triaged"
+          color: "kt-triaged"
+        - status: "in-progress"
+          label: "In Progress"
+          color: "kt-inprogress"
+        - status: "waiting"
+          label: "Waiting"
+          color: "kt-waiting"
+        - status: "resolved"
+          label: "Resolved"
+          color: "kt-resolved"
+        - status: "closed"
+          label: "Closed"
+          color: "kt-closed"
+        - status: "cancelled"
+          label: "Cancelled"
+          color: "kt-cancelled"
+      card_fields: ["id", "title", "client", "priority", "assignee", "sla_remaining"]
+    detail:
+      sections:
+        - header
+        - conversation
+        - ai_panel
+        - ticket_info
+        - asset_info
+        - activity_timeline
+        - related_records
+      ai_panel:
+        enabled: true
+        show_summary: true
+        show_likely_cause: true
+        show_recommended_steps: true
+        show_similar_tickets: true
+        show_knowledge_articles: true
+        show_actions: true
+
+  # Customer views
+  customers:
+    detail:
+      sections:
+        - overview
+        - contacts
+        - assets
+        - tickets
+        - contracts
+        - billing
+        - knowledge
+
+  # Asset views
+  assets:
+    detail:
+      sections:
+        - overview
+        - specifications
+        - tickets
+        - maintenance
+        - changes
+        - knowledge
+        - network
+
+  # Search
+  search:
+    enabled: true
+    placeholder: "Search tickets, customers, assets, knowledge..."
+    suggestions: true
+    recent_searches: 10
+    filters:
+      - type: "tickets"
+      - type: "customers"
+      - type: "assets"
+      - type: "knowledge"
+      - type: "projects"
+
+  # Command palette
+  command_palette:
+    enabled: true
+    shortcut: "Cmd+K"
+    commands:
+      - id: "new-ticket"
+        label: "Create Ticket"
+        icon: "plus"
+        action: "navigate:/tickets/new"
+      - id: "new-customer"
+        label: "Create Customer"
+        icon: "user-plus"
+        action: "navigate:/customers/new"
+      - id: "new-asset"
+        label: "Create Asset"
+        icon: "monitor"
+        action: "navigate:/assets/new"
+      - id: "search"
+        label: "Search..."
+        icon: "search"
+        action: "focus:search"
+      - id: "dashboard"
+        label: "Open Dashboard"
+        icon: "layout-dashboard"
+        action: "navigate:/dashboard"
+
+  # Responsive breakpoints
+  responsive:
+    mobile: 480
+    tablet: 768
+    desktop: 1024
+    wide: 1440
+
+  # Animations
+  animations:
+    enabled: true
+    reduced_motion: true
+    duration_fast: 150
+    duration_normal: 250
+    duration_slow: 350
+
+  # Density
+  density:
+    default: "comfortable"
+    options: ["compact", "comfortable", "spacious"]

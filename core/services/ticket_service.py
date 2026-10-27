@@ -286,15 +286,19 @@ class BaseService(Generic[T]):
         # not from a value diff. Setting a field to its current value
         # still requires the permission.
         assignment_keys = {"assigned_to", "assigned_team"} & set(changes.keys())
-        if self.entity_type == "ticket" and assignment_keys:
-            required: set[str] = {"ticket.assign"}
+        if self.entity_type == "ticket":
+            required: set[str] = set()
+            if assignment_keys:
+                required.add("ticket.assign")
+            if "status" in changes:
+                required.add("ticket.change_status")
+            # Empty changes or any non-assignment/non-status field
+            # still requires ticket.update
+            non_assignment_keys = set(changes.keys()) - {"assigned_to", "assigned_team", "status"}
+            if non_assignment_keys or not changes:
+                required.add("ticket.update")
         else:
             required: set[str] = {f"{self.entity_type}.update"}
-        # A mixed change (assignment + any other field) needs both.
-        if self.entity_type == "ticket" and assignment_keys:
-            other_keys = set(changes.keys()) - {"assigned_to", "assigned_team"}
-            if other_keys:
-                required.add("ticket.update")
 
         # Check ALL required permissions BEFORE any read or write.
         for perm in required:

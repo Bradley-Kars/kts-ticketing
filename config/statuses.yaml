@@ -1,0 +1,267 @@
+# KTS Ticketing System — Status Definitions
+# Each status has metadata for workflow, UI, and automation.
+
+statuses:
+  # === Tickets ===
+  ticket:
+    new:
+      name: "New"
+      category: "open"
+      terminal: false
+      description: "Submitted, not yet reviewed"
+      color: "kt-new"
+      icon: "circle"
+      order: 10
+      allowed_transitions: ["triaged", "cancelled"]
+      sla_starts: true
+
+    triaged:
+      name: "Triaged"
+      category: "open"
+      terminal: false
+      description: "Assessed, scheduled, or assigned"
+      color: "kt-triaged"
+      icon: "check-circle"
+      order: 20
+      allowed_transitions: ["in-progress", "waiting", "cancelled", "new"]
+      sla_starts: true
+
+    in-progress:
+      name: "In Progress"
+      category: "active"
+      terminal: false
+      description: "Actively being worked on"
+      color: "kt-inprogress"
+      icon: "loader"
+      order: 30
+      allowed_transitions: ["waiting", "resolved", "triaged", "cancelled"]
+      requires_next_action: true
+
+    waiting:
+      name: "Waiting"
+      category: "pending"
+      terminal: false
+      description: "Blocked on customer, vendor, or third party"
+      color: "kt-waiting"
+      icon: "clock"
+      order: 40
+      allowed_transitions: ["in-progress", "resolved", "cancelled"]
+      requires_follow_up: true
+      follow_up_required: true
+
+    resolved:
+      name: "Resolved"
+      category: "resolved"
+      terminal: false
+      description: "Work complete, awaiting confirmation/payment"
+      color: "kt-resolved"
+      icon: "check"
+      order: 50
+      allowed_transitions: ["closed", "in-progress", "waiting", "cancelled"]
+      auto_close_after_days: 7
+      requires_customer_confirmation: true
+
+    closed:
+      name: "Closed"
+      category: "closed"
+      terminal: true
+      description: "Fully settled (paid or no-charge)"
+      color: "kt-closed"
+      icon: "archive"
+      order: 60
+      allowed_transitions: []
+
+    cancelled:
+      name: "Cancelled"
+      category: "closed"
+      terminal: true
+      description: "Work cancelled, never delete a ticket"
+      color: "kt-cancelled"
+      icon: "x-circle"
+      order: 70
+      allowed_transitions: []
+
+  # === Clients ===
+  client:
+    active:
+      name: "Active"
+      category: "active"
+      terminal: false
+      color: "kt-green"
+      order: 10
+
+    prospect:
+      name: "Prospect"
+      category: "open"
+      terminal: false
+      color: "kt-amber"
+      order: 20
+
+    inactive:
+      name: "Inactive"
+      category: "closed"
+      terminal: true
+      color: "kt-muted"
+      order: 30
+
+    former:
+      name: "Former"
+      category: "closed"
+      terminal: true
+      color: "kt-muted"
+      order: 40
+
+  # === Assets ===
+  asset:
+    active:
+      name: "Active"
+      category: "active"
+      terminal: false
+      color: "kt-green"
+      order: 10
+
+    maintenance:
+      name: "Maintenance"
+      category: "active"
+      terminal: false
+      color: "kt-amber"
+      order: 20
+
+    spare:
+      name: "Spare"
+      category: "active"
+      terminal: false
+      color: "kt-teal"
+      order: 30
+
+    retired:
+      name: "Retired"
+      category: "closed"
+      terminal: true
+      color: "kt-muted"
+      order: 40
+
+    lost:
+      name: "Lost"
+      category: "closed"
+      terminal: true
+      color: "kt-red"
+      order: 50
+
+  # === Knowledge ===
+  knowledge:
+    draft:
+      name: "Draft"
+      category: "open"
+      terminal: false
+      color: "kt-new"
+      order: 10
+
+    review:
+      name: "In Review"
+      category: "active"
+      terminal: false
+      color: "kt-triaged"
+      order: 20
+
+    published:
+      name: "Published"
+      category: "resolved"
+      terminal: false
+      color: "kt-green"
+      order: 30
+
+    archived:
+      name: "Archived"
+      category: "closed"
+      terminal: true
+      color: "kt-muted"
+      order: 40
+
+  # === Problems ===
+  problem:
+    investigating:
+      name: "Investigating"
+      category: "active"
+      terminal: false
+      color: "kt-inprogress"
+      order: 10
+
+    known_error:
+      name: "Known Error"
+      category: "active"
+      terminal: false
+      color: "kt-amber"
+      order: 20
+
+    workaround:
+      name: "Workaround Available"
+      category: "active"
+      terminal: false
+      color: "kt-teal"
+      order: 30
+
+    resolved:
+      name: "Resolved"
+      category: "resolved"
+      terminal: false
+      color: "kt-resolved"
+      order: 40
+
+    closed:
+      name: "Closed"
+      category: "closed"
+      terminal: true
+      color: "kt-closed"
+      order: 50
+
+  # === Changes ===
+  change:
+    requested:
+      name: "Requested"
+      category: "open"
+      terminal: false
+      color: "kt-new"
+      order: 10
+
+    assessing:
+      name: "Assessing"
+      category: "active"
+      terminal: false
+      color: "kt-triaged"
+      order: 20
+
+    approved:
+      name: "Approved"
+      category: "active"
+      terminal: false
+      color: "kt-green"
+      order: 30
+
+    scheduled:
+      name: "Scheduled"
+      category: "active"
+      terminal: false
+      color: "kt-teal"
+      order: 40
+
+    implementing:
+      name: "Implementing"
+      category: "active"
+      terminal: false
+      color: "kt-inprogress"
+      order: 50
+
+    reviewing:
+      name: "Reviewing"
+      category: "pending"
+      terminal: false
+      color: "kt-amber"
+      order: 60
+
+    closed:
+      name: "Closed"
+      category: "closed"
+      terminal: true
+      color: "kt-closed"
+      order: 70

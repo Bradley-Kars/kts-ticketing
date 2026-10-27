@@ -1,0 +1,410 @@
+# KTS Ticketing System — Granular Permissions Model
+
+# Permission definitions
+permissions:
+  # === Ticket Permissions ===
+  ticket.read:
+    description: "View tickets and ticket details"
+    roles: ["admin", "technician", "dispatcher", "manager", "viewer", "ai"]
+
+  ticket.create:
+    description: "Create new tickets"
+    roles: ["admin", "technician", "dispatcher"]
+
+  ticket.update:
+    description: "Update ticket fields (title, description, category, etc.)"
+    roles: ["admin", "technician", "dispatcher", "ai"]
+
+  ticket.delete:
+    description: "Delete tickets (never used — cancel instead)"
+    roles: ["admin"]
+
+  ticket.assign:
+    description: "Assign or reassign tickets to users/teams"
+    roles: ["admin", "dispatcher", "manager"]
+
+  ticket.close:
+    description: "Close tickets (move to closed status)"
+    roles: ["admin", "technician", "manager"]
+
+  ticket.change_priority:
+    description: "Change ticket priority (including overrides)"
+    roles: ["admin", "technician", "manager"]
+
+  ticket.change_status:
+    description: "Change ticket status (workflow transitions)"
+    roles: ["admin", "technician", "dispatcher", "manager"]
+
+  ticket.add_worklog:
+    description: "Add work-log entries (billing)"
+    roles: ["admin", "technician", "dispatcher"]
+
+  ticket.remove_worklog:
+    description: "Remove work-log entries (billing correction, requires reason)"
+    roles: ["admin"]
+
+  ticket.link:
+    description: "Link tickets to assets, clients, other tickets"
+    roles: ["admin", "technician", "dispatcher"]
+
+  ticket.view_billing:
+    description: "View billing amounts on tickets"
+    roles: ["admin", "manager", "technician"]
+
+  # === Client Permissions ===
+  client.read:
+    description: "View client records"
+    roles: ["admin", "technician", "dispatcher", "manager", "viewer", "ai"]
+
+  client.create:
+    description: "Create new client records"
+    roles: ["admin", "dispatcher", "manager"]
+
+  client.update:
+    description: "Update client records"
+    roles: ["admin", "dispatcher", "manager"]
+
+  client.delete:
+    description: "Delete client records"
+    roles: ["admin"]
+
+  client.view_billing:
+    description: "View client billing summary"
+    roles: ["admin", "manager"]
+
+  # === Contact Permissions ===
+  contact.read:
+    description: "View contact records"
+    roles: ["admin", "technician", "dispatcher", "manager", "viewer", "ai"]
+
+  contact.create:
+    description: "Create new contact records"
+    roles: ["admin", "technician", "dispatcher", "manager"]
+
+  contact.update:
+    description: "Update contact records"
+    roles: ["admin", "technician", "dispatcher", "manager"]
+
+  contact.delete:
+    description: "Delete contact records"
+    roles: ["admin"]
+
+  # === Organization Permissions ===
+  organization.read:
+    description: "View organization records"
+    roles: ["admin", "technician", "dispatcher", "manager", "viewer", "ai"]
+
+  organization.create:
+    description: "Create new organization records"
+    roles: ["admin", "dispatcher", "manager"]
+
+  organization.update:
+    description: "Update organization records"
+    roles: ["admin", "dispatcher", "manager"]
+
+  organization.delete:
+    description: "Delete organization records"
+    roles: ["admin"]
+
+  # === Asset Permissions ===
+  asset.read:
+    description: "View asset records"
+    roles: ["admin", "technician", "dispatcher", "manager", "viewer", "ai"]
+
+  asset.create:
+    description: "Create new asset records"
+    roles: ["admin", "technician", "dispatcher"]
+
+  asset.update:
+    description: "Update asset records"
+    roles: ["admin", "technician", "dispatcher"]
+
+  asset.delete:
+    description: "Delete asset records"
+    roles: ["admin"]
+
+  asset.assign:
+    description: "Assign assets to users/organizations"
+    roles: ["admin", "technician", "dispatcher"]
+
+  asset.link:
+    description: "Link assets to tickets or other entities"
+    roles: ["admin", "technician", "dispatcher"]
+
+  # === User Permissions ===
+  user.read:
+    description: "View user/technician records"
+    roles: ["admin", "manager", "ai"]
+
+  user.create:
+    description: "Create new user records"
+    roles: ["admin"]
+
+  user.update:
+    description: "Update user records"
+    roles: ["admin"]
+
+  user.delete:
+    description: "Delete user records"
+    roles: ["admin"]
+
+  user.manage_teams:
+    description: "Manage team membership"
+    roles: ["admin", "manager"]
+
+  # === Project Permissions ===
+  project.read:
+    description: "View project records"
+    roles: ["admin", "technician", "dispatcher", "manager", "viewer", "ai"]
+
+  project.create:
+    description: "Create new projects"
+    roles: ["admin", "manager"]
+
+  project.update:
+    description: "Update project records"
+    roles: ["admin", "manager"]
+
+  project.delete:
+    description: "Delete project records"
+    roles: ["admin"]
+
+  project.manage_tasks:
+    description: "Manage tasks within projects"
+    roles: ["admin", "technician", "manager"]
+
+  # === Task Permissions ===
+  task.read:
+    description: "View tasks"
+    roles: ["admin", "technician", "dispatcher", "manager", "viewer", "ai"]
+
+  task.create:
+    description: "Create new tasks"
+    roles: ["admin", "technician", "manager"]
+
+  task.update:
+    description: "Update tasks"
+    roles: ["admin", "technician", "manager"]
+
+  task.delete:
+    description: "Delete tasks"
+    roles: ["admin"]
+
+  task.assign:
+    description: "Assign tasks to users"
+    roles: ["admin", "technician", "manager"]
+
+  # === Knowledge Permissions ===
+  knowledge.read:
+    description: "View knowledge articles"
+    roles: ["admin", "technician", "dispatcher", "manager", "viewer", "ai"]
+
+  knowledge.create:
+    description: "Create knowledge articles (draft)"
+    roles: ["admin", "technician"]
+
+  knowledge.update:
+    description: "Update knowledge articles"
+    roles: ["admin", "technician"]
+
+  knowledge.publish:
+    description: "Publish knowledge articles"
+    roles: ["admin", "manager"]
+
+  knowledge.delete:
+    description: "Delete knowledge articles"
+    roles: ["admin"]
+
+  # === Problem Permissions ===
+  problem.read:
+    description: "View problem records"
+    roles: ["admin", "technician", "dispatcher", "manager", "viewer", "ai"]
+
+  problem.create:
+    description: "Create problem records"
+    roles: ["admin", "technician"]
+
+  problem.update:
+    description: "Update problem records"
+    roles: ["admin", "technician"]
+
+  problem.delete:
+    description: "Delete problem records"
+    roles: ["admin"]
+
+  # === Change Permissions ===
+  change.read:
+    description: "View change records"
+    roles: ["admin", "technician", "dispatcher", "manager", "viewer", "ai"]
+
+  change.create:
+    description: "Create change requests"
+    roles: ["admin", "technician", "manager"]
+
+  change.update:
+    description: "Update change records"
+    roles: ["admin", "technician", "manager"]
+
+  change.approve:
+    description: "Approve changes"
+    roles: ["admin", "manager"]
+
+  change.implement:
+    description: "Implement approved changes"
+    roles: ["admin", "technician"]
+
+  change.delete:
+    description: "Delete change records"
+    roles: ["admin"]
+
+  # === Automation Permissions ===
+  automation.read:
+    description: "View automation rules"
+    roles: ["admin", "manager"]
+
+  automation.create:
+    description: "Create automation rules"
+    roles: ["admin"]
+
+  automation.update:
+    description: "Update automation rules"
+    roles: ["admin"]
+
+  automation.execute:
+    description: "Execute automation actions (system)"
+    roles: ["admin", "system"]
+
+  # === AI Permissions ===
+  ai.suggest:
+    description: "Generate AI suggestions"
+    roles: ["admin", "technician", "ai"]
+
+  ai.approve:
+    description: "Approve/reject AI suggestions"
+    roles: ["admin", "technician", "manager"]
+
+  ai.execute:
+    description: "Execute approved AI actions"
+    roles: ["admin", "ai"]
+
+  ai.configure:
+    description: "Configure AI models and behavior"
+    roles: ["admin"]
+
+  # === System Permissions ===
+  audit.read:
+    description: "View audit/event log"
+    roles: ["admin", "manager"]
+
+  system.admin:
+    description: "Full system administration"
+    roles: ["admin"]
+
+  system.configure:
+    description: "Configure system settings"
+    roles: ["admin"]
+
+  system.migrate:
+    description: "Run migrations"
+    roles: ["admin"]
+
+  system.backup:
+    description: "Manage backups"
+    roles: ["admin"]
+
+# Role definitions (collections of permissions)
+roles:
+  admin:
+    description: "Full system access"
+    permissions: ["*"]
+
+  technician:
+    description: "Field technician — performs work, updates tickets"
+    permissions:
+      - "ticket.*"
+      - "client.read"
+      - "contact.*"
+      - "organization.read"
+      - "asset.*"
+      - "project.read"
+      - "task.*"
+      - "knowledge.*"
+      - "problem.*"
+      - "change.*"
+      - "ai.suggest"
+      - "ai.approve"
+
+  dispatcher:
+    description: "Dispatches tickets, manages assignments"
+    permissions:
+      - "ticket.read"
+      - "ticket.create"
+      - "ticket.assign"
+      - "ticket.change_status"
+      - "ticket.add_worklog"
+      - "ticket.link"
+      - "client.*"
+      - "contact.read"
+      - "organization.read"
+      - "asset.read"
+      - "project.read"
+      - "task.read"
+      - "knowledge.read"
+      - "automation.read"
+
+  manager:
+    description: "Team manager — oversight, approvals, reporting"
+    permissions:
+      - "ticket.*"
+      - "client.*"
+      - "contact.read"
+      - "organization.*"
+      - "asset.read"
+      - "project.*"
+      - "task.*"
+      - "knowledge.publish"
+      - "problem.*"
+      - "change.*"
+      - "change.approve"
+      - "automation.*"
+      - "ai.approve"
+      - "audit.read"
+      - "system.configure"
+
+  viewer:
+    description: "Read-only access"
+    permissions:
+      - "*.read"
+
+  ai:
+    description: "AI agent — reads data, generates suggestions, updates tickets with AI results"
+    permissions:
+      - "ticket.read"
+      - "ticket.update"
+      - "client.read"
+      - "contact.read"
+      - "organization.read"
+      - "asset.read"
+      - "project.read"
+      - "task.read"
+      - "knowledge.read"
+      - "problem.read"
+      - "change.read"
+      - "ai.suggest"
+      - "ai.execute"
+
+  system:
+    description: "System/automation — executes approved actions"
+    permissions:
+      - "automation.execute"
+      - "ai.execute"
+
+# Default role for new users
+default_role: "viewer"
+
+# Permission check behavior
+enforcement:
+  enabled: true
+  deny_by_default: true
+  log_denials: true
+  log_approvals: true

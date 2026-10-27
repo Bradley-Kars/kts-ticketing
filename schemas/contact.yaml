@@ -1,0 +1,114 @@
+# KTS Ticketing System — Contact Schema
+# Individual people within organizations
+
+contact:
+  description: "Individual contact person"
+  allOf:
+    - $ref: "base.yaml#/base_record"
+  properties:
+    type:
+      const: "contact"
+      enum: ["contact"]
+
+    first_name:
+      type: "string"
+      minLength: 1
+
+    last_name:
+      type: "string"
+      minLength: 1
+
+    display_name:
+      type: "string"
+      description: "Formatted: 'First Last'"
+
+    organization_id:
+      type: "string"
+      pattern: "^ORG-\\d{6,}$"
+
+    role:
+      type: "string"
+      description: "Job title/role (e.g., 'IT Manager', 'Owner')"
+
+    department:
+      type: "string"
+
+    email:
+      type: "array"
+      items:
+        type: "string"
+        format: "email"
+      uniqueItems: true
+
+    phone:
+      type: "array"
+      items:
+        type: "string"
+      uniqueItems: true
+
+    mobile:
+      type: "array"
+      items:
+        type: "string"
+      uniqueItems: true
+
+    preferred_contact_method:
+      type: "string"
+      enum:
+        - "email"
+        - "phone"
+        - "sms"
+        - "teams"
+        - "slack"
+      default: "email"
+
+    timezone:
+      type: "string"
+      default: "America/Chicago"
+
+    language:
+      type: "string"
+      default: "en"
+
+    # Contact preferences
+    preferences:
+      type: "object"
+      properties:
+        notify_on_ticket_updates:
+          type: "boolean"
+          default: true
+        notify_on_status_changes:
+          type: "boolean"
+          default: true
+        cc_on_all_communications:
+          type: "boolean"
+          default: false
+
+    # Status
+    status:
+      type: "string"
+      enum:
+        - "active"
+        - "inactive"
+        - "former"
+      default: "active"
+
+    # Custom fields
+    custom_fields:
+      type: "object"
+      additionalProperties: true
+
+  required:
+    - "id"
+    - "type"
+    - "title"
+    - "status"
+    - "created_at"
+    - "updated_at"
+    - "created_by"
+    - "updated_by"
+    - "tags"
+    - "relationships"
+    - "first_name"
+    - "last_name"
+    - "organization_id"

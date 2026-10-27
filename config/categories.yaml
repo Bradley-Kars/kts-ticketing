@@ -1,0 +1,273 @@
+# KTS Ticketing System — Categories, Types, and Work Types
+
+# Ticket types (ITIL-aligned)
+ticket_types:
+  incident:
+    name: "Incident"
+    description: "Unplanned interruption or reduction in quality of an IT service"
+    icon: "alert-triangle"
+    color: "kt-red"
+    default_priority: "high"
+    default_category: "support"
+    sla_policy: "standard"
+    requires_asset: false
+    requires_root_cause: false
+
+  service_request:
+    name: "Service Request"
+    description: "Formal request for a new service, access, or information"
+    icon: "clipboard-list"
+    color: "kt-teal"
+    default_priority: "medium"
+    default_category: "setup"
+    sla_policy: "standard"
+    requires_asset: false
+    requires_root_cause: false
+
+  problem:
+    name: "Problem"
+    description: "Underlying cause of one or more incidents"
+    icon: "bug"
+    color: "kt-amber"
+    default_priority: "high"
+    default_category: "maintenance"
+    sla_policy: "problem"
+    requires_asset: false
+    requires_root_cause: true
+
+  change:
+    name: "Change"
+    description: "Addition, modification, or removal of anything that could affect IT services"
+    icon: "git-branch"
+    color: "kt-blue"
+    default_priority: "medium"
+    default_category: "project"
+    sla_policy: "change"
+    requires_asset: true
+    requires_root_cause: false
+
+  task:
+    name: "Task"
+    description: "Discrete unit of work, often part of a project"
+    icon: "check-square"
+    color: "kt-muted"
+    default_priority: "low"
+    default_category: "project"
+    sla_policy: "standard"
+    requires_asset: false
+    requires_root_cause: false
+
+  maintenance:
+    name: "Maintenance"
+    description: "Scheduled preventive or corrective maintenance"
+    icon: "wrench"
+    color: "kt-green"
+    default_priority: "low"
+    default_category: "maintenance"
+    sla_policy: "maintenance"
+    requires_asset: true
+    requires_root_cause: false
+
+  project:
+    name: "Project"
+    description: "Multi-ticket initiative with defined scope and timeline"
+    icon: "folder-git"
+    color: "kt-purple"
+    default_priority: "medium"
+    default_category: "project"
+    sla_policy: "project"
+    requires_asset: false
+    requires_root_cause: false
+
+  internal:
+    name: "Internal"
+    description: "Internal IT work not billable to a customer"
+    icon: "home"
+    color: "kt-muted"
+    default_priority: "low"
+    default_category: "support"
+    sla_policy: "internal"
+    requires_asset: false
+    requires_root_cause: false
+
+  question:
+    name: "Question"
+    description: "Information request, not a service request"
+    icon: "help-circle"
+    color: "kt-teal"
+    default_priority: "low"
+    default_category: "follow-up"
+    sla_policy: "standard"
+    requires_asset: false
+    requires_root_cause: false
+
+# Categories (high-level grouping)
+categories:
+  support:
+    name: "Support"
+    description: "Break/fix, troubleshooting, issue resolution"
+    icon: "life-buoy"
+    color: "kt-red"
+    order: 10
+
+  setup:
+    name: "Setup"
+    description: "New device, network, software, or service setup"
+    icon: "package"
+    color: "kt-teal"
+    order: 20
+
+  maintenance:
+    name: "Maintenance"
+    description: "Preventive, scheduled, or corrective maintenance"
+    icon: "wrench"
+    color: "kt-green"
+    order: 30
+
+  project:
+    name: "Project"
+    description: "Multi-phase initiatives, implementations, migrations"
+    icon: "folder-git"
+    color: "kt-purple"
+    order: 40
+
+  billing:
+    name: "Billing"
+    description: "Invoice, payment, contract, billing questions"
+    icon: "credit-card"
+    color: "kt-amber"
+    order: 50
+
+  follow-up:
+    name: "Follow-up"
+    description: "Post-service check-ins, customer satisfaction, renewals"
+    icon: "message-circle"
+    color: "kt-blue"
+    order: 60
+
+  security:
+    name: "Security"
+    description: "Security incidents, hardening, compliance, audits"
+    icon: "shield"
+    color: "kt-red"
+    order: 70
+
+  backup:
+    name: "Backup"
+    description: "Backup configuration, restore, disaster recovery"
+    icon: "database"
+    color: "kt-teal"
+    order: 80
+
+# Work types (granular classification for reporting and checklists)
+work_types:
+  virus:
+    name: "Virus/Malware"
+    category: "support"
+    icon: "bug"
+    checklist: "Virus & Malware Checklist"
+
+  network:
+    name: "Network"
+    category: "support"
+    icon: "wifi"
+    checklist: "Network Troubleshooting Checklist"
+
+  email:
+    name: "Email"
+    category: "support"
+    icon: "mail"
+    checklist: "Email & Deliverability Checklist"
+
+  hardware:
+    name: "Hardware"
+    category: "support"
+    icon: "cpu"
+    checklist: "Hardware Repair Checklist"
+
+  software:
+    name: "Software"
+    category: "support"
+    icon: "monitor"
+    checklist: "Software Support Checklist"
+
+  audio:
+    name: "Audio/Video"
+    category: "support"
+    icon: "volume-2"
+    checklist: "Remote Support Checklist"
+
+  security:
+    name: "Security"
+    category: "security"
+    icon: "shield"
+    checklist: "Security Checklist"
+
+  backup:
+    name: "Backup/Recovery"
+    category: "backup"
+    icon: "database"
+    checklist: "Backup & Recovery Checklist"
+
+  consult:
+    name: "Consulting"
+    category: "project"
+    icon: "lightbulb"
+    checklist: "New Client Onboarding Checklist"
+
+  other:
+    name: "Other"
+    category: "support"
+    icon: "more-horizontal"
+    checklist: ""
+
+# Subcategories (optional, per category)
+subcategories:
+  support:
+    - connectivity
+    - performance
+    - access
+    - configuration
+    - compatibility
+    - data_loss
+  setup:
+    - new_device
+    - network_config
+    - software_install
+    - account_creation
+    - migration
+  maintenance:
+    - preventive
+    - corrective
+    - patching
+    - monitoring
+    - optimization
+  project:
+    - planning
+    - implementation
+    - testing
+    - deployment
+    - documentation
+  billing:
+    - invoice
+    - payment
+    - contract
+    - dispute
+    - refund
+  follow-up:
+    - satisfaction
+    - renewal
+    - upsell
+    - check_in
+    - feedback
+  security:
+    - incident
+    - vulnerability
+    - compliance
+    - audit
+    - hardening
+  backup:
+    - configuration
+    - restore
+    - dr_test
+    - monitoring

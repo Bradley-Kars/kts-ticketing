@@ -1,0 +1,70 @@
+# KTS Ticketing System — Core Configuration
+# This file is authoritative. All clients (CLI, GUI, AI, Automation) read from here.
+
+system:
+  name: "KTS Records"
+  version: "1.0.0"
+  description: "Professional ticketing and service management inside Obsidian"
+
+  # Vault location (authoritative data)
+  vault_path: "~/Documents/KTS Records"
+
+  # System directories (generated/disposable)
+  system_path: "~/.ticketing"
+  indexes_path: "~/.ticketing/indexes"
+  events_path: "~/.ticketing/events"
+  ai_path: "~/.ticketing/ai"
+  backups_path: "~/.ticketing/backups"
+
+  # ID allocation
+  id_counters:
+    TKT: "per-year"          # TKT-YYYY-### (year-based sequential)
+    CUS: "global"            # CUS-000001 (global sequential)
+    CON: "global"
+    ORG: "global"
+    AST: "global"
+    USR: "global"
+    PRJ: "global"
+    TSK: "global"
+    KB:  "global"
+    PRB: "global"
+    CHG: "global"
+    REQ: "global"
+    CRT: "global"
+    EVT: "global"            # EVT-00000001 (global sequential)
+    AIS: "global"
+    AIA: "global"
+
+  # Feature flags
+  features:
+    ai_enabled: true
+    automation_enabled: true
+    events_enabled: true
+    permissions_enabled: true
+    search_enabled: true
+    webhooks_enabled: false
+
+  # Defaults
+  defaults:
+    ticket_status: "new"
+    ticket_priority: "medium"
+    ticket_category: "support"
+    ticket_type: "incident"
+    sla_policy: "standard"
+    timezone: "America/Chicago"
+    date_format: "YYYY-MM-DD"
+    datetime_format: "YYYY-MM-DDTHH:mm:ssZ"
+
+  # Backup
+  backup:
+    enabled: true
+    retention_days: 30
+    pre_migration: true
+    pre_destructive: true
+
+  # Logging
+  logging:
+    level: "INFO"
+    file: "~/.ticketing/system.log"
+    max_size_mb: 10
+    max_files: 5

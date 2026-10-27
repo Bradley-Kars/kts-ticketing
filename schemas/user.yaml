@@ -1,0 +1,139 @@
+# KTS Ticketing System — User/Technician Schema
+# Internal staff/technicians
+
+user:
+  description: "Internal user/technician/staff member"
+  allOf:
+    - $ref: "base.yaml#/base_record"
+  properties:
+    type:
+      const: "user"
+      enum: ["user"]
+
+    first_name:
+      type: "string"
+      minLength: 1
+
+    last_name:
+      type: "string"
+      minLength: 1
+
+    display_name:
+      type: "string"
+
+    username:
+      type: "string"
+      pattern: "^[a-z][a-z0-9._-]{2,}$"
+      description: "System username"
+
+    email:
+      type: "string"
+      format: "email"
+
+    phone:
+      type: "string"
+
+    role:
+      type: "string"
+      enum:
+        - "admin"
+        - "technician"
+        - "dispatcher"
+        - "manager"
+        - "viewer"
+      default: "technician"
+
+    teams:
+      type: "array"
+      items:
+        type: "string"
+      description: "Team memberships"
+
+    skills:
+      type: "array"
+      items:
+        type: "string"
+      description: "Technical skills for routing"
+
+    certifications:
+      type: "array"
+      items:
+        type: "object"
+        properties:
+          name:
+            type: "string"
+          issuer:
+            type: "string"
+          obtained_date:
+            type: "string"
+            format: "date"
+          expiration_date:
+            type: "string"
+            format: "date"
+
+    capacity_hours_per_day:
+      type: "number"
+      minimum: 0
+      maximum: 24
+      default: 8
+
+    timezone:
+      type: "string"
+      default: "America/Chicago"
+
+    status:
+      type: "string"
+      enum:
+        - "active"
+        - "inactive"
+        - "on-leave"
+        - "terminated"
+      default: "active"
+
+    avatar:
+      type: "string"
+      description: "Avatar image path or URL"
+
+    # Notification preferences
+    notifications:
+      type: "object"
+      properties:
+        email_on_assignment:
+          type: "boolean"
+          default: true
+        email_on_mentions:
+          type: "boolean"
+          default: true
+        email_on_sla_risk:
+          type: "boolean"
+          default: true
+        desktop_on_assignment:
+          type: "boolean"
+          default: true
+        desktop_on_mentions:
+          type: "boolean"
+          default: true
+        desktop_on_sla_risk:
+          type: "boolean"
+          default: true
+
+    custom_fields:
+      type: "object"
+      additionalProperties: true
+
+  required:
+    - "id"
+    - "type"
+    - "title"
+    - "status"
+    - "created_at"
+    - "updated_at"
+    - "created_by"
+    - "updated_by"
+    - "tags"
+    - "relationships"
+    - "first_name"
+    - "last_name"
+    - "username"
+    - "email"
+    - "role"

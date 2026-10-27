@@ -219,6 +219,27 @@ def test_assigned_to_current_value_requires_ticket_assign(tmp_path: Path):
 
 
 # ---------------------------------------------------------------------------
+# A6-1d2: Status change requires ticket.change_status
+# ---------------------------------------------------------------------------
+def test_status_change_requires_ticket_change_status(tmp_path: Path):
+    svc = TicketService(event_emitter=EventEmitter(EventStore()),
+                        permission_checker=None)
+    actor = _make_actor("USR-000001")
+    tid = _next_id("TKT-2026", width=3)
+    _create_ticket(svc, actor, tid, {"status": "new"})
+
+    # Actor has ONLY ticket.update
+    svc.permission_checker = _make_checker({"ticket.update"})
+
+    try:
+        svc.update(tid, {"status": "resolved"}, actor)
+        assert False, "BUG: status change allowed with only ticket.update"
+    except PermissionError as exc:
+        assert "ticket.change_status" in str(exc), \
+            f"Expected ticket.change_status denial, got: {exc}"
+
+
+# ---------------------------------------------------------------------------
 # A6-1e: Assign-only actor can change assigned_to alone
 # ---------------------------------------------------------------------------
 def test_assign_only_can_change_assigned_to(tmp_path: Path):

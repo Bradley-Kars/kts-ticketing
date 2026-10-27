@@ -16,6 +16,8 @@ events/
 Knowledge/
 Tasks/
 Projects/
+Clients/
+ai/
 indexes/
 id-counters.json
 after/
@@ -42,3 +44,6 @@ __pycache__/
 
 # Python
 build/
+
+# KTS-specific plugins (not part of core backend)
+plugins/kts-rebuild/

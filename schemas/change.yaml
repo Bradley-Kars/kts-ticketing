@@ -1,0 +1,154 @@
+# KTS Ticketing System — Change Schema
+# Change management records (ITIL Change Management)
+
+change:
+  description: "Change request/record"
+  allOf:
+    - $ref: "base.yaml#/base_record"
+  properties:
+    type:
+      const: "change"
+      enum: ["change"]
+
+    change_type:
+      type: "string"
+      enum:
+        - "standard"
+        - "normal"
+        - "emergency"
+      default: "normal"
+
+    risk:
+      type: "string"
+      enum:
+        - "low"
+        - "medium"
+        - "high"
+      default: "low"
+
+    impact:
+      type: "string"
+      enum:
+        - "low"
+        - "medium"
+        - "high"
+      default: "low"
+
+    description:
+      type: "string"
+
+    status:
+      type: "string"
+      enum:
+        - "requested"
+        - "assessing"
+        - "approved"
+        - "scheduled"
+        - "implementing"
+        - "reviewing"
+        - "closed"
+        - "cancelled"
+      default: "requested"
+
+    requester:
+      type: "string"
+      pattern: "^USR-\\d{6,}$"
+
+    approver:
+      type: "string"
+      pattern: "^USR-\\d{6,}$"
+
+    implementer:
+      type: "string"
+      pattern: "^USR-\\d{6,}$"
+
+    organization_id:
+      type: "string"
+      pattern: "^ORG-\\d{6,}$"
+
+    affected_assets:
+      type: "array"
+      items:
+        type: "string"
+        pattern: "^AST-\\d{6,}$"
+
+    planned_start:
+      type: "string"
+      format: "date-time"
+
+    planned_end:
+      type: "string"
+      format: "date-time"
+
+    actual_start:
+      type: "string"
+      format: "date-time"
+
+    actual_end:
+      type: "string"
+      format: "date-time"
+
+    downtime_required:
+      type: "boolean"
+      default: false
+
+    downtime_minutes:
+      type: "integer"
+      minimum: 0
+
+    backout_plan:
+      type: "string"
+      description: "Rollback procedure if change fails"
+
+    test_plan:
+      type: "string"
+      description: "Testing procedure after implementation"
+
+    implementation_plan:
+      type: "string"
+      description: "Step-by-step implementation instructions"
+
+    related_problem:
+      type: "string"
+      pattern: "^PRB-\\d{6,}$"
+
+    related_tickets:
+      type: "array"
+      items:
+        type: "string"
+        pattern: "^(TKT-\\d{4}-\\d{3}|TCK-\\d{6,})$"
+
+    change_advisory_board:
+      type: "array"
+      items:
+        type: "string"
+        pattern: "^USR-\\d{6,}$"
+      description: "CAB members who reviewed/approved"
+
+    approval_date:
+      type: "string"
+      format: "date-time"
+
+    tags:
+      type: "array"
+      items:
+        type: "string"
+
+    custom_fields:
+      type: "object"
+      additionalProperties: true
+
+  required:
+    - "id"
+    - "type"
+    - "title"
+    - "status"
+    - "created_at"
+    - "updated_at"
+    - "created_by"
+    - "updated_by"
+    - "tags"
+    - "relationships"
+    - "change_type"
+    - "description"
+    - "requester"

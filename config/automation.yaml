@@ -1,0 +1,432 @@
+# KTS Ticketing System — Automation Rules Engine
+
+automation:
+  enabled: true
+  engine: "event-driven"  # event-driven | scheduled | hybrid
+  max_concurrent_rules: 10
+  default_timeout_seconds: 300
+  retry_attempts: 3
+  retry_backoff_seconds: 60
+
+# Rule structure:
+# - id: unique identifier
+# - name: human-readable
+# - description: what it does
+# - enabled: true/false
+# - trigger: when it fires
+# - conditions: must all be true (AND)
+# - actions: what to do (executed in order)
+# - priority: execution order (lower = first)
+
+rules:
+  # === Assignment Rules ===
+  - id: "auto-assign-network"
+    name: "Auto-assign network tickets to Network Team"
+    description: "When a network category ticket is created, assign to Network Team"
+    enabled: true
+    trigger:
+      type: "entity_created"
+      entity_type: "ticket"
+    conditions:
+      - field: "category"
+        operator: "equals"
+        value: "network"
+      - field: "assigned_to"
+        operator: "is_null"
+        value: true
+    actions:
+      - type: "assign_team"
+        team: "Network Team"
+      - type: "set_priority"
+        priority: "high"
+        reason: "Network tickets default to high priority"
+      - type: "notify"
+        channel: "desktop"
+        recipients: ["Network Team"]
+        template: "new-ticket-assigned"
+      - type: "log_activity"
+        note: "Auto-assigned to Network Team via automation rule"
+    priority: 10
+
+  - id: "auto-assign-security"
+    name: "Auto-assign security tickets to Security Team"
+    description: "When a security category ticket is created, assign to Security Team"
+    enabled: true
+    trigger:
+      type: "entity_created"
+      entity_type: "ticket"
+    conditions:
+      - field: "category"
+        operator: "equals"
+        value: "security"
+      - field: "assigned_to"
+        operator: "is_null"
+        value: true
+    actions:
+      - type: "assign_team"
+        team: "Security Team"
+      - type: "set_priority"
+        priority: "critical"
+        reason: "Security tickets default to critical priority"
+      - type: "notify"
+        channel: "desktop"
+        recipients: ["Security Team"]
+        template: "new-ticket-assigned"
+      - type: "log_activity"
+        note: "Auto-assigned to Security Team via automation rule"
+    priority: 10
+
+  - id: "auto-assign-billing"
+    name: "Auto-assign billing tickets to dispatcher"
+    description: "Billing tickets go to dispatcher for routing"
+    enabled: true
+    trigger:
+      type: "entity_created"
+      entity_type: "ticket"
+    conditions:
+      - field: "category"
+        operator: "equals"
+        value: "billing"
+      - field: "assigned_to"
+        operator: "is_null"
+        value: true
+    actions:
+      - type: "assign_user"
+        user: "USR-000001"
+      - type: "notify"
+        channel: "desktop"
+        recipients: ["USR-000001"]
+        template: "new-ticket-assigned"
+    priority: 10
+
+  # === SLA Rules ===
+  - id: "sla-warning-30min"
+    name: "SLA breach warning at 30 minutes remaining"
+    description: "Flag tickets approaching SLA breach"
+    enabled: true
+    trigger:
+      type: "schedule"
+      cron: "*/5 * * * *"  # Every 5 minutes
+    conditions:
+      - field: "sla_resolution_due"
+        operator: "less_than"
+        value: "+30m"
+      - field: "status"
+        operator: "not_in"
+        value: ["resolved", "closed", "cancelled"]
+      - field: "tags"
+        operator: "not_contains"
+        value: "sla-at-risk"
+    actions:
+      - type: "add_tag"
+        tag: "sla-at-risk"
+      - type: "notify"
+        channel: "desktop"
+        recipients: ["assignee", "dispatcher", "manager"]
+        template: "sla-warning"
+      - type: "log_activity"
+        note: "SLA breach risk detected (30 min remaining)"
+    priority: 5
+
+  - id: "sla-warning-1hour"
+    name: "SLA breach warning at 1 hour remaining"
+    description: "Early warning for SLA approaching"
+    enabled: true
+    trigger:
+      type: "schedule"
+      cron: "*/15 * * * *"
+    conditions:
+      - field: "sla_resolution_due"
+        operator: "less_than"
+        value: "+1h"
+      - field: "status"
+        operator: "not_in"
+        value: ["resolved", "closed", "cancelled"]
+      - field: "tags"
+        operator: "not_contains"
+        value: "sla-warning-1h"
+    actions:
+      - type: "add_tag"
+        tag: "sla-warning-1h"
+      - type: "notify"
+        channel: "desktop"
+        recipients: ["assignee"]
+        template: "sla-warning-early"
+    priority: 5
+
+  - id: "sla-breached"
+    name: "SLA breached — escalate"
+    description: "Escalate when SLA has been breached"
+    enabled: true
+    trigger:
+      type: "schedule"
+      cron: "*/5 * * * *"
+    conditions:
+      - field: "sla_resolution_due"
+        operator: "less_than"
+        value: "now"
+      - field: "status"
+        operator: "not_in"
+        value: ["resolved", "closed", "cancelled"]
+      - field: "tags"
+        operator: "not_contains"
+        value: "sla-breached"
+    actions:
+      - type: "add_tag"
+        tag: "sla-breached"
+      - type: "notify"
+        channel: "desktop"
+        recipients: ["assignee", "dispatcher", "manager", "admin"]
+        template: "sla-breached"
+      - type: "escalate"
+        level: 2
+      - type: "log_activity"
+        note: "SLA BREACHED — escalated to management"
+    priority: 1
+
+  # === Status Workflow Rules ===
+  - id: "auto-close-resolved-managed"
+    name: "Auto-close resolved tickets for managed clients after 7 days"
+    description: "Managed tier clients: auto-close resolved after customer confirmation window"
+    enabled: true
+    trigger:
+      type: "entity_updated"
+      entity_type: "ticket"
+      field: "status"
+      value: "resolved"
+    conditions:
+      - field: "organization.tier"
+        operator: "equals"
+        value: "managed"
+    actions:
+      - type: "wait_for"
+        condition: "customer_confirmation_received"
+        timeout: "7d"
+      - type: "set_status"
+        status: "closed"
+        reason: "Auto-closed after 7-day confirmation window (managed client)"
+      - type: "log_activity"
+        note: "Auto-closed after managed client confirmation window"
+    priority: 20
+
+  - id: "reopen-on-customer-reply"
+    name: "Reopen ticket if customer replies to closed ticket"
+    description: "Customer communication on closed ticket reopens it"
+    enabled: true
+    trigger:
+      type: "customer_communication"
+      entity_type: "ticket"
+    conditions:
+      - field: "status"
+        operator: "in"
+        value: ["closed", "cancelled"]
+    actions:
+      - type: "set_status"
+        status: "new"
+        reason: "Customer replied to closed ticket"
+      - type: "notify"
+        channel: "desktop"
+        recipients: ["assignee", "dispatcher"]
+        template: "ticket-reopened"
+      - type: "log_activity"
+        note: "Reopened due to customer communication"
+    priority: 15
+
+  # === Follow-up Rules ===
+  - id: "waiting-followup-reminder"
+    name: "Remind on waiting tickets past follow-up date"
+    description: "Daily reminder for waiting tickets that need follow-up"
+    enabled: true
+    trigger:
+      type: "schedule"
+      cron: "0 8 * * *"  # 8 AM daily
+    conditions:
+      - field: "status"
+        operator: "equals"
+        value: "waiting"
+      - field: "follow_up"
+        operator: "less_than_or_equal"
+        value: "today"
+    actions:
+      - type: "notify"
+        channel: "desktop"
+        recipients: ["assignee"]
+        template: "waiting-followup-due"
+      - type: "log_activity"
+        note: "Waiting ticket follow-up due today"
+    priority: 15
+
+  - id: "waiting-no-followup-set"
+    name: "Flag waiting tickets without follow-up date"
+    description: "Waiting tickets must have a follow-up date"
+    enabled: true
+    trigger:
+      type: "entity_updated"
+      entity_type: "ticket"
+      field: "status"
+      value: "waiting"
+    conditions:
+      - field: "follow_up"
+        operator: "is_null"
+        value: true
+    actions:
+      - type: "notify"
+        channel: "desktop"
+        recipients: ["assignee", "dispatcher"]
+        template: "waiting-missing-followup"
+      - type: "log_activity"
+        note: "WARNING: Waiting ticket missing required follow-up date"
+    priority: 10
+
+  # === AI Rules ===
+  - id: "ai-classify-new-ticket"
+    name: "AI classify new tickets"
+    description: "Run AI classification on new tickets"
+    enabled: true
+    trigger:
+      type: "entity_created"
+      entity_type: "ticket"
+    conditions:
+      - field: "ai.classification_confidence"
+        operator: "is_null"
+        value: true
+    actions:
+      - type: "ai_classify"
+        model: "opencode/nemotron-3-ultra-free"
+      - type: "ai_find_similar"
+        limit: 5
+      - type: "log_activity"
+        note: "AI classification and similar ticket search completed"
+    priority: 20
+
+  - id: "ai-suggest-troubleshooting"
+    name: "AI suggest troubleshooting for in-progress tickets"
+    description: "Generate AI troubleshooting suggestions when ticket moves to in-progress"
+    enabled: true
+    trigger:
+      type: "entity_updated"
+      entity_type: "ticket"
+      field: "status"
+      value: "in-progress"
+    conditions:
+      - field: "ai.troubleshooting_suggested"
+        operator: "not_equals"
+        value: true
+    actions:
+      - type: "ai_suggest_troubleshooting"
+        model: "opencode/nemotron-3-ultra-free"
+      - type: "log_activity"
+        note: "AI troubleshooting suggestions generated"
+    priority: 20
+
+  # === Knowledge Rules ===
+  - id: "create-knowledge-from-resolution"
+    name: "Suggest knowledge article from resolved ticket"
+    description: "When ticket resolved with good resolution, suggest KB article"
+    enabled: true
+    trigger:
+      type: "entity_updated"
+      entity_type: "ticket"
+      field: "status"
+      value: "resolved"
+    conditions:
+      - field: "resolution"
+        operator: "not_empty"
+        value: true
+      - field: "category"
+        operator: "in"
+        value: ["support", "maintenance", "security"]
+    actions:
+      - type: "ai_suggest_knowledge"
+        model: "opencode/nemotron-3-ultra-free"
+      - type: "notify"
+        channel: "desktop"
+        recipients: ["assignee"]
+        template: "knowledge-suggestion"
+    priority: 30
+
+# Notification templates (referenced by rules)
+notification_templates:
+  new-ticket-assigned:
+    subject: "New ticket assigned: {{ticket.id}} — {{ticket.title}}"
+    body: |
+      Ticket {{ticket.id}} has been assigned to you.
+      
+      **Client:** {{ticket.client.name}}
+      **Priority:** {{ticket.priority}}
+      **Category:** {{ticket.category}}
+      
+      {{ticket.summary}}
+      
+      View: {{ticket.url}}
+
+  sla-warning:
+    subject: "⚠️ SLA AT RISK: {{ticket.id}} — {{ticket.title}}"
+    body: |
+      Ticket {{ticket.id}} is approaching SLA breach.
+      
+      **Time remaining:** {{ticket.sla.remaining}}
+      **Priority:** {{ticket.priority}}
+      **Assignee:** {{ticket.assignee.display_name}}
+      
+      Please prioritize this ticket.
+      
+      View: {{ticket.url}}
+
+  sla-warning-early:
+    subject: "⏰ SLA Warning: {{ticket.id}} — 1 hour remaining"
+    body: |
+      Ticket {{ticket.id}} has 1 hour until SLA breach.
+      
+      View: {{ticket.url}}
+
+  sla-breached:
+    subject: "🚨 SLA BREACHED: {{ticket.id}} — {{ticket.title}}"
+    body: |
+      Ticket {{ticket.id}} has BREACHED its SLA.
+      
+      **Breached by:** {{ticket.sla.breach_duration}}
+      **Priority:** {{ticket.priority}}
+      **Assignee:** {{ticket.assignee.display_name}}
+      
+      This has been escalated to management.
+      
+      View: {{ticket.url}}
+
+  waiting-followup-due:
+    subject: "📅 Follow-up due: {{ticket.id}} — {{ticket.title}}"
+    body: |
+      Waiting ticket {{ticket.id}} has a follow-up due today.
+      
+      **Waiting on:** {{ticket.waiting_on}}
+      **Follow-up date:** {{ticket.follow_up}}
+      
+      View: {{ticket.url}}
+
+  waiting-missing-followup:
+    subject: "⚠️ Waiting ticket missing follow-up date: {{ticket.id}}"
+    body: |
+      Ticket {{ticket.id}} was moved to 'waiting' but has no follow-up date set.
+      
+      Please set a follow-up date immediately.
+      
+      View: {{ticket.url}}
+
+  ticket-reopened:
+    subject: "🔄 Ticket reopened: {{ticket.id}} — {{ticket.title}}"
+    body: |
+      Ticket {{ticket.id}} was reopened due to customer communication.
+      
+      **Customer:** {{ticket.client.name}}
+      **Previous status:** {{ticket.previous_status}}
+      
+      View: {{ticket.url}}
+
+  knowledge-suggestion:
+    subject: "💡 Knowledge article suggested from {{ticket.id}}"
+    body: |
+      The resolution of ticket {{ticket.id}} may be suitable for a knowledge base article.
+      
+      AI has generated a draft. Please review and publish if appropriate.
+      
+      View ticket: {{ticket.url}}

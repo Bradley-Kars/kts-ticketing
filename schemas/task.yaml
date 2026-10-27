@@ -1,0 +1,88 @@
+# KTS Ticketing System — Task Schema
+# Granular work items (can be standalone or part of project)
+
+task:
+  description: "Task/work item record"
+  allOf:
+    - $ref: "base.yaml#/base_record"
+  properties:
+    type:
+      const: "task"
+      enum: ["task"]
+
+    description:
+      type: "string"
+
+    project_id:
+      type: "string"
+      pattern: "^PRJ-\\d{6,}$"
+
+    ticket_id:
+      type: "string"
+      pattern: "^(TKT-\\d{4}-\\d{3}|TCK-\\d{6,})$"
+
+    assignee:
+      type: "string"
+      pattern: "^USR-\\d{6,}$"
+
+    status:
+      type: "string"
+      enum:
+        - "todo"
+        - "in-progress"
+        - "waiting"
+        - "review"
+        - "done"
+        - "cancelled"
+      default: "todo"
+
+    priority:
+      type: "string"
+      enum:
+        - "critical"
+        - "high"
+        - "medium"
+        - "low"
+      default: "medium"
+
+    due_date:
+      type: "string"
+      format: "date"
+
+    start_date:
+      type: "string"
+      format: "date"
+
+    completed_date:
+      type: "string"
+      format: "date"
+
+    estimated_hours:
+      type: "number"
+      minimum: 0
+
+    actual_hours:
+      type: "number"
+      minimum: 0
+      default: 0
+
+    tags:
+      type: "array"
+      items:
+        type: "string"
+
+    custom_fields:
+      type: "object"
+      additionalProperties: true
+
+  required:
+    - "id"
+    - "type"
+    - "title"
+    - "status"
+    - "created_at"
+    - "updated_at"
+    - "created_by"
+    - "updated_by"
+    - "tags"
+    - "relationships"

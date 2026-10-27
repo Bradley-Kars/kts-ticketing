@@ -1,0 +1,274 @@
+# KTS Ticketing System — Universal Base Record Schema
+# All entity schemas extend this base schema.
+
+base_record:
+  description: "Universal base schema for all entity types"
+  type: "object"
+  required:
+    - "id"
+    - "type"
+    - "title"
+    - "status"
+    - "created_at"
+    - "updated_at"
+    - "created_by"
+    - "updated_by"
+    - "tags"
+    - "relationships"
+  properties:
+    id:
+      type: "string"
+      description: "Immutable unique identifier"
+      pattern: "^(TKT-\\d{4}-\\d{3}|[A-Z]{3,4}-\\d{6,})$"
+      examples:
+        - "TKT-2026-004"
+        - "CUS-000001"
+        - "EVT-00000001"
+        - "AIS-000001"
+
+    type:
+      type: "string"
+      description: "Entity type discriminator"
+      enum:
+        - "ticket"
+        - "client"
+        - "contact"
+        - "organization"
+        - "asset"
+        - "user"
+        - "project"
+        - "task"
+        - "knowledge"
+        - "problem"
+        - "change"
+        - "request"
+        - "contract"
+        - "event"
+        - "ai_suggestion"
+        - "ai_action"
+        - "ai_observation"
+
+    title:
+      type: "string"
+      description: "Human-readable title/name"
+      minLength: 1
+      maxLength: 200
+
+    status:
+      type: "string"
+      description: "Current lifecycle status (per entity type)"
+
+    created_at:
+      type: "string"
+      format: "date-time"
+      description: "Creation timestamp (ISO 8601)"
+
+    updated_at:
+      type: "string"
+      format: "date-time"
+      description: "Last modification timestamp (ISO 8601)"
+
+    created_by:
+      type: "string"
+      description: "Actor who created this record"
+      pattern: "^(USR|AI|SYS|AUT)-"
+
+    updated_by:
+      type: "string"
+      description: "Actor who last modified this record"
+      pattern: "^(USR|AI|SYS|AUT)-"
+
+    tags:
+      type: "array"
+      description: "Free-form tags for filtering/grouping"
+      items:
+        type: "string"
+        minLength: 1
+        maxLength: 50
+      uniqueItems: true
+
+    relationships:
+      type: "array"
+      description: "Structured relationships to other entities"
+      items:
+        type: "object"
+        required: ["type", "target"]
+        properties:
+          type:
+            type: "string"
+            description: "Relationship type"
+            enum:
+              - "parent_of"
+              - "child_of"
+              - "related"
+              - "duplicate_of"
+              - "duplicated_by"
+              - "caused_by"
+              - "causes"
+              - "resolves"
+              - "resolved_by"
+              - "affected_asset"
+              - "affects"
+              - "affected_customer"
+              - "affected_organization"
+              - "reported_by"
+              - "reported"
+              - "assigned_to"
+              - "assigned"
+              - "documents_resolution"
+              - "resolution_documented_in"
+              - "blocks"
+              - "blocked_by"
+              - "depends_on"
+              - "dependency_of"
+          target:
+            type: "string"
+            description: "Target entity ID"
+            pattern: "^(TKT-\\d{4}-\\d{3}|[A-Z]{3,4}-\\d{6,})$"
+          metadata:
+            type: "object"
+            description: "Additional relationship metadata"
+            additionalProperties: true
+
+    # AI fields (minimal, references to AI artifacts)
+    ai:
+      type: "object"
+      description: "AI metadata references (artifacts stored in .ticketing/ai/)"
+      properties:
+        last_summary_at:
+          type: "string"
+          format: "date-time"
+        last_classification_at:
+          type: "string"
+          format: "date-time"
+        pending_suggestions:
+          type: "array"
+          items:
+            type: "string"
+            pattern: "^AIS-\\d{6,}$"
+        confidence_score:
+          type: "number"
+          minimum: 0
+          maximum: 1
+
+    # Version for optimistic locking
+    version:
+      type: "integer"
+      minimum: 1
+      default: 1
+      description: "Optimistic lock version"
+
+# ID validation patterns per entity type
+id_patterns:
+  TKT: "^TKT-\\d{4}-\\d{3}$"           # TKT-2026-004 (year-based)
+  TCK: "^TCK-\\d{6,}$"                 # TCK-000001 (sequential, if used)
+  CUS: "^CUS-\\d{6,}$"
+  CON: "^CON-\\d{6,}$"
+  ORG: "^ORG-\\d{6,}$"
+  AST: "^AST-\\d{6,}$"
+  USR: "^USR-\\d{6,}$"
+  PRJ: "^PRJ-\\d{6,}$"
+  TSK: "^TSK-\\d{6,}$"
+  KB:  "^KB-\\d{6,}$"
+  PRB: "^PRB-\\d{6,}$"
+  CHG: "^CHG-\\d{6,}$"
+  REQ: "^REQ-\\d{6,}$"
+  CRT: "^CRT-\\d{6,}$"
+  EVT: "^EVT-\\d{8,}$"
+  AIS: "^AIS-\\d{6,}$"
+  AIA: "^AIA-\\d{6,}$"
+
+# Relationship type definitions
+relationship_types:
+  parent_of:
+    inverse: "child_of"
+    description: "Hierarchical parent"
+    symmetric: false
+  child_of:
+    inverse: "parent_of"
+    description: "Hierarchical child"
+    symmetric: false
+  related:
+    inverse: "related"
+    description: "General symmetric relationship"
+    symmetric: true
+  duplicate_of:
+    inverse: "duplicated_by"
+    description: "This entity is a duplicate of target"
+    symmetric: false
+  duplicated_by:
+    inverse: "duplicate_of"
+    description: "Target is a duplicate of this entity"
+    symmetric: false
+  caused_by:
+    inverse: "causes"
+    description: "This entity was caused by target (incident -> problem)"
+    symmetric: false
+  causes:
+    inverse: "caused_by"
+    description: "This entity caused target (problem -> incident)"
+    symmetric: false
+  resolves:
+    inverse: "resolved_by"
+    description: "This entity resolves target (change -> problem)"
+    symmetric: false
+  resolved_by:
+    inverse: "resolves"
+    description: "Target resolves this entity (problem -> change)"
+    symmetric: false
+  affected_asset:
+    inverse: "affects"
+    description: "This entity affects the target asset"
+    symmetric: false
+  affects:
+    inverse: "affected_asset"
+    description: "This entity is affected by target"
+    symmetric: false
+  affected_customer:
+    inverse: "affects"
+    description: "This entity affects the target customer/contact"
+    symmetric: false
+  affected_organization:
+    inverse: "affects"
+    description: "This entity affects the target organization"
+    symmetric: false
+  reported_by:
+    inverse: "reported"
+    description: "This entity was reported by target contact"
+    symmetric: false
+  reported:
+    inverse: "reported_by"
+    description: "Target entity was reported by this contact"
+    symmetric: false
+  assigned_to:
+    inverse: "assigned"
+    description: "This entity is assigned to target user"
+    symmetric: false
+  assigned:
+    inverse: "assigned_to"
+    description: "Target entity is assigned to this user"
+    symmetric: false
+  documents_resolution:
+    inverse: "resolution_documented_in"
+    description: "This knowledge article documents resolution of target"
+    symmetric: false
+  resolution_documented_in:
+    inverse: "documents_resolution"
+    description: "Target knowledge article documents this entity's resolution"
+    symmetric: false
+  blocks:
+    inverse: "blocked_by"
+    description: "This entity blocks target entity"
+    symmetric: false
+  blocked_by:
+    inverse: "blocks"
+    description: "This entity is blocked by target entity"
+    symmetric: false
+  depends_on:
+    inverse: "dependency_of"
+    description: "This entity depends on target entity"
+    symmetric: false
+  dependency_of:
+    inverse: "depends_on"
+    description: "Target entity depends on this entity"
+    symmetric: false

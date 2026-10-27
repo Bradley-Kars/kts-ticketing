@@ -1,0 +1,184 @@
+# KTS Ticketing System — Asset Schema
+# Devices, equipment, infrastructure
+
+asset:
+  description: "IT asset/device record"
+  allOf:
+    - $ref: "base.yaml#/base_record"
+  properties:
+    type:
+      const: "asset"
+      enum: ["asset"]
+
+    asset_type:
+      type: "string"
+      enum:
+        - "workstation"
+        - "laptop"
+        - "server"
+        - "network"
+        - "printer"
+        - "mobile"
+        - "software"
+        - "storage"
+        - "ups"
+        - "camera"
+        - "access_control"
+        - "phone_system"
+        - "other"
+      default: "other"
+
+    hostname:
+      type: "string"
+      description: "Network hostname"
+
+    serial_number:
+      type: "string"
+      description: "Manufacturer serial number"
+
+    asset_tag:
+      type: "string"
+      description: "Internal asset tag (e.g., KTS-AST-0014)"
+
+    manufacturer:
+      type: "string"
+
+    model:
+      type: "string"
+
+    model_year:
+      type: "integer"
+      minimum: 1990
+      maximum: 2030
+
+    operating_system:
+      type: "string"
+
+    os_version:
+      type: "string"
+
+    processor:
+      type: "string"
+
+    memory_gb:
+      type: "integer"
+      minimum: 0
+
+    storage_gb:
+      type: "integer"
+      minimum: 0
+
+    storage_type:
+      type: "string"
+      enum:
+        - "SSD"
+        - "HDD"
+        - "NVMe"
+        - "Hybrid"
+        - "Unknown"
+
+    organization_id:
+      type: "string"
+      pattern: "^ORG-\\d{6,}$"
+
+    assigned_to:
+      type: "string"
+      pattern: "^CON-\\d{6,}$"
+      description: "Primary user of this asset"
+
+    location:
+      type: "string"
+      description: "Physical location (building, floor, room, desk)"
+
+    status:
+      type: "string"
+      enum:
+        - "active"
+        - "maintenance"
+        - "spare"
+        - "retired"
+        - "lost"
+        - "stolen"
+      default: "active"
+
+    purchase_date:
+      type: "string"
+      format: "date"
+
+    warranty_expiration:
+      type: "string"
+      format: "date"
+
+    warranty_provider:
+      type: "string"
+
+    ip_addresses:
+      type: "array"
+      items:
+        type: "string"
+      uniqueItems: true
+
+    mac_addresses:
+      type: "array"
+      items:
+        type: "string"
+      uniqueItems: true
+
+    installed_software:
+      type: "array"
+      items:
+        type: "object"
+        properties:
+          name:
+            type: "string"
+          version:
+            type: "string"
+          license_key:
+            type: "string"
+          install_date:
+            type: "string"
+            format: "date"
+
+    network_info:
+      type: "object"
+      properties:
+        switch_port:
+          type: "string"
+        vlan:
+          type: "integer"
+        dhcp:
+          type: "boolean"
+        subnet:
+          type: "string"
+        gateway:
+          type: "string"
+        dns_servers:
+          type: "array"
+          items:
+            type: "string"
+
+    tags:
+      type: "array"
+      items:
+        type: "string"
+
+    notes:
+      type: "string"
+
+    custom_fields:
+      type: "object"
+      additionalProperties: true
+
+  required:
+    - "id"
+    - "type"
+    - "title"
+    - "status"
+    - "created_at"
+    - "updated_at"
+    - "created_by"
+    - "updated_by"
+    - "tags"
+    - "relationships"
+    - "asset_type"
+    - "hostname"

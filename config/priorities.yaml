@@ -1,0 +1,94 @@
+# KTS Ticketing System — Priority & Impact/Urgency Matrix
+
+priorities:
+  critical:
+    name: "Critical"
+    level: 1
+    color: "kt-urgent"
+    description: "Down, data at risk, revenue stopping, alarm tripping"
+    response_target_minutes: 15
+    resolution_target_hours: 4
+    escalation_minutes: 30
+    icon: "alert-triangle"
+    order: 10
+
+  high:
+    name: "High"
+    level: 2
+    color: "kt-high"
+    description: "Blocked work, hard deadline, security concern, business-critical"
+    response_target_minutes: 60
+    resolution_target_hours: 8
+    escalation_minutes: 120
+    icon: "alert-circle"
+    order: 20
+
+  medium:
+    name: "Medium"
+    level: 3
+    color: "kt-medium"
+    description: "Normal break/fix, setup, request"
+    response_target_minutes: 240
+    resolution_target_hours: 48
+    escalation_minutes: 480
+    icon: "alert"
+    order: 30
+
+  low:
+    name: "Low"
+    level: 4
+    color: "kt-low"
+    description: "Nice-to-have, 'whenever you're out here'"
+    response_target_minutes: 1440
+    resolution_target_hours: 120
+    escalation_minutes: 2880
+    icon: "info"
+    order: 40
+
+  informational:
+    name: "Informational"
+    level: 5
+    color: "kt-muted"
+    description: "FYI, documentation, no action required"
+    response_target_minutes: 10080
+    resolution_target_hours: 0
+    escalation_minutes: 0
+    icon: "help-circle"
+    order: 50
+
+# Impact/Urgency → Priority Matrix
+# Used for automatic priority derivation when not manually overridden
+impact_urgency_matrix:
+  # impact x urgency = priority
+  critical:
+    critical: critical
+    high: critical
+    medium: high
+    low: high
+  high:
+    critical: critical
+    high: high
+    medium: high
+    low: medium
+  medium:
+    critical: high
+    high: high
+    medium: medium
+    low: medium
+  low:
+    critical: high
+    high: medium
+    medium: low
+    low: low
+
+# Override rules
+override:
+  allowed_roles: ["admin", "technician", "manager"]
+  requires_reason: true
+  audit: true
+
+# Default values when not specified
+defaults:
+  impact: "medium"
+  urgency: "medium"
+  priority: "medium"

@@ -1,0 +1,155 @@
+# KTS Ticketing System — Organization Schema
+# Companies/organizations (distinct from individual clients)
+
+organization:
+  description: "Company/organization entity"
+  allOf:
+    - $ref: "base.yaml#/base_record"
+  properties:
+    type:
+      const: "organization"
+      enum: ["organization"]
+
+    name:
+      type: "string"
+      minLength: 1
+      description: "Organization display name"
+
+    legal_name:
+      type: "string"
+      description: "Legal registered name"
+
+    industry:
+      type: "string"
+      enum:
+        - "healthcare"
+        - "education"
+        - "government"
+        - "manufacturing"
+        - "retail"
+        - "professional_services"
+        - "technology"
+        - "hospitality"
+        - "construction"
+        - "finance"
+        - "real_estate"
+        - "non_profit"
+        - "other"
+
+    size:
+      type: "string"
+      enum:
+        - "small"
+        - "medium"
+        - "large"
+        - "enterprise"
+      description: "Employee count bands"
+
+    status:
+      type: "string"
+      enum:
+        - "active"
+        - "prospect"
+        - "former"
+        - "vendor"
+      default: "active"
+
+    tier:
+      type: "string"
+      enum:
+        - "managed"
+        - "project"
+        - "break-fix"
+        - "vendor"
+      default: "break-fix"
+      description: "Service tier"
+
+    # Primary contacts
+    primary_contact_id:
+      type: "string"
+      pattern: "^CON-\\d{6,}$"
+
+    billing_contact_id:
+      type: "string"
+      pattern: "^CON-\\d{6,}$"
+
+    technical_contact_id:
+      type: "string"
+      pattern: "^CON-\\d{6,}$"
+
+    # Address
+    address:
+      type: "object"
+      properties:
+        street:
+          type: "string"
+        city:
+          type: "string"
+        state:
+          type: "string"
+        postal_code:
+          type: "string"
+        country:
+          type: "string"
+          default: "US"
+
+    # Billing defaults
+    billing:
+      type: "object"
+      properties:
+        rate:
+          type: "number"
+          minimum: 0
+        terms:
+          type: "string"
+          enum:
+            - "due-upon-receipt"
+            - "net15"
+            - "net30"
+            - "net60"
+            - "custom"
+          default: "net30"
+        currency:
+          type: "string"
+          default: "USD"
+        tax_exempt:
+          type: "boolean"
+          default: false
+        tax_id:
+          type: "string"
+        po_required:
+          type: "boolean"
+          default: false
+
+    # SLA
+    sla_policy:
+      type: "string"
+      default: "standard"
+
+    contract_id:
+      type: "string"
+      pattern: "^CRT-\\d{6,}$"
+
+    # Tags
+    tags:
+      type: "array"
+      items:
+        type: "string"
+
+    # Custom fields
+    custom_fields:
+      type: "object"
+      additionalProperties: true
+
+  required:
+    - "id"
+    - "type"
+    - "title"
+    - "status"
+    - "created_at"
+    - "updated_at"
+    - "created_by"
+    - "updated_by"
+    - "tags"
+    - "relationships"
+    - "name"
