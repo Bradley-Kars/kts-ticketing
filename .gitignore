@@ -62,3 +62,4 @@ htmlcov/
 # pytest
 .pytest_cache/
 auth/audit.log
+core/sandbox.py
