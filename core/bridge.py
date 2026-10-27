@@ -38,7 +38,6 @@ from .services.ticket_service import VersionMismatch
 # Service actor for bridge-originated writes (MC-2 T1).
 # Re-created inside each test setup; never hand-edited into the shared
 # sandbox users.yaml (suite reset wipes it).
-BRIDGE_ACTOR_ID = "USR-000002"
 BRIDGE_ACTOR_NAME = "KTS Bridge"
 
 _WRITE_METHODS = frozenset({"POST", "PUT", "PATCH", "DELETE"})
@@ -458,6 +457,18 @@ def create_app(table: Optional[TokenTable] = None) -> FastAPI:
         request.state.label = rec["label"]
         request.state.scope = token_scope
         request.state.actor_id = rec.get("actor_id")
+        if not request.state.actor_id:
+            table.audit_request(
+                method=request.method,
+                path=request.url.path,
+                status=401,
+                latency_ms=int((time.perf_counter() - start) * 1000),
+                source=client_host,
+                reason="token has no actor_id",
+            )
+            return JSONResponse(
+                {"detail": "token has no actor_id"}, status_code=401
+            )
 
         response = await call_next(request)
 

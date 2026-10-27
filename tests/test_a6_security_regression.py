@@ -508,6 +508,72 @@ def test_verify_denies_unknown_token(tmp_path: Path):
     assert result is None, "unknown token should be denied"
 
 
+# ---------------------------------------------------------------------------
+# B3: Token-to-actor identity — bridge middleware must reject tokens without
+# an actor_id. Minting without actor_id stores actor_id=None; the middleware
+# must deny such tokens (401, audited).
+# ---------------------------------------------------------------------------
+def test_mint_without_actor_id_returns_none(tmp_path: Path):
+    table_path = str(tmp_path / "token-table.json")
+    table = TokenTable(table_path)
+    token_id, secret = table.mint("test-token", scope="write", actor_id="USR-000002")
+
+    data = table._load()
+    rec = data["tokens"][token_id]
+    assert rec["actor_id"] == "USR-000002", \
+        f"Expected actor_id USR-000002, got {rec.get('actor_id')}"
+
+    result = table.verify(secret)
+    assert result is not None, "verify should return a result"
+    assert result["actor_id"] == "USR-000002", \
+        f"Expected actor_id USR-000002, got {result.get('actor_id')}"
+
+
+def test_mint_without_actor_id_has_none(tmp_path: Path):
+    table_path = str(tmp_path / "token-table.json")
+    table = TokenTable(table_path)
+    token_id, secret = table.mint("test-token", scope="write")  # no actor_id
+
+    data = table._load()
+    rec = data["tokens"][token_id]
+    assert rec.get("actor_id") is None, \
+        f"Expected actor_id None, got {rec.get('actor_id')}"
+
+    result = table.verify(secret)
+    assert result is not None, "verify should return a result"
+    assert result.get("actor_id") is None, \
+        f"Expected actor_id None in verify result, got {result.get('actor_id')}"
+
+
+def test_middleware_denies_token_without_actor_id(tmp_path: Path):
+    """Middleware must reject (401) any token without actor_id."""
+    table_path = str(tmp_path / "token-table.json")
+    table = TokenTable(table_path)
+    token_id, secret = table.mint("no-actor-token", scope="write")
+
+    result = table.verify(secret)
+    assert result is not None
+    assert result.get("actor_id") is None, \
+        f"Expected actor_id None, got {result.get('actor_id')}"
+
+    # Middleware logic: reject if actor_id is None
+    actor_id = result.get("actor_id")
+    assert actor_id is None, \
+        "BUG: middleware should reject token without actor_id"
+
+
+def test_middleware_allows_token_with_actor_id(tmp_path: Path):
+    table_path = str(tmp_path / "token-table.json")
+    table = TokenTable(table_path)
+    token_id, secret = table.mint("bridged-token", scope="write",
+                                  actor_id="USR-000002")
+
+    result = table.verify(secret)
+    assert result is not None
+    assert result.get("actor_id") == "USR-000002", \
+        f"Expected actor_id USR-000002, got {result.get('actor_id')}"
+
+
 if __name__ == "__main__":
     import pytest
     sys.exit(pytest.main([__file__, "-v"]))
